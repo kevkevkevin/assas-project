@@ -6,12 +6,12 @@ import { getStorage } from "firebase/storage";
 
 // PASTE YOUR CONFIG OBJECT HERE (From the Firebase Console)
 const firebaseConfig = {
-  apiKey: "AIzaSyAvGivBpzLppWjmIg1jGC_8TIGdMLirCP8",
-  authDomain: "autosettle-a5fb6.firebaseapp.com",
-  projectId: "autosettle-a5fb6",
-  storageBucket: "autosettle-a5fb6.firebasestorage.app",
-  messagingSenderId: "194973486584",
-  appId: "1:194973486584:web:075831cecbcf5c9c695a0d"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
