@@ -7,7 +7,7 @@ import { db } from "../../../lib/firebase";
 import { CarFront, Calendar, CheckCircle, Clock, Users, Search, SlidersHorizontal, X, AlertCircle, Upload, ShieldCheck } from "lucide-react";
 
 const AVAILABLE_CARS = [
-  { id: "c1", make: "Toyota", model: "Camry", year: "2024", color: "Pearl White", price: 65, image: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fd?auto=format&fit=crop&q=80&w=800", type: "Sedan", seats: 5, fuel: "gasoline", transmission: "automatic" },
+  { id: "c1", make: "Toyota", model: "Camry", year: "2024", color: "Pearl White", price: 65, image: "https://images.toyota-europe.com/hu/product-token/249c2709-1c4d-49c9-a758-babff8a95f6e/vehicle/467670d4-a811-40d6-bee0-5d56c108006d/width/1600/height/900/scale-mode/1/padding/12/background-colour/FFFFFF/image-quality/75/day-exterior-3_1F7_FA20.webp", type: "Sedan", seats: 5, fuel: "gasoline", transmission: "automatic" },
   { id: "c2", make: "BMW", model: "X5", year: "2023", color: "Midnight Black", price: 120, image: "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&q=80&w=800", type: "SUV", seats: 5, fuel: "gasoline", transmission: "automatic" },
   { id: "c3", make: "Tesla", model: "Model 3", year: "2024", color: "Midnight Silver", price: 95, image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80&w=800", type: "Sedan", seats: 5, fuel: "electric", transmission: "automatic" },
   { id: "c4", make: "Ford", model: "F-150", year: "2023", color: "Oxford White", price: 85, image: "https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&q=80&w=800", type: "Truck", seats: 5, fuel: "gasoline", transmission: "automatic" },

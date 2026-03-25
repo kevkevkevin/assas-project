@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { CarFront, ArrowRight, Search, ShieldCheck, Zap, Star, ArrowRightLeft, CheckCircle } from "lucide-react";
-import Services from "@/components/Services";
 import CTASection from "@/components/CTASection";
 import FadeIn from "@/components/FadeIn";
 import Footer from "@/components/Footer";
+import Services from "@/components/Services";
 
 // Dummy data for our new gorgeous cards
 const TOP_CARS = [
-  { id: "1", make: "Toyota", model: "Camry", year: "2024", price: 65, image: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fd?auto=format&fit=crop&q=80&w=800" },
+  { id: "1", make: "Toyota", model: "Camry", year: "2024", price: 65, image: "https://www.autobond.cz/wp-content/uploads/2018/10/camry.png" },
   { id: "2", make: "BMW", model: "X5", year: "2023", price: 120, image: "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?auto=format&fit=crop&q=80&w=800" },
   { id: "3", make: "Tesla", model: "Model 3", year: "2024", price: 95, image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80&w=800" },
   { id: "4", make: "Mercedes", model: "C-Class", year: "2024", price: 110, image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=800" },
@@ -28,14 +28,30 @@ export default function LandingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   
-  // NEW: State to track what the user types in the search bar
   const [searchQuery, setSearchQuery] = useState("");
 
-  // NEW: Handle the search submit
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  // NEW: Smart Routing for Rentals!
+  const handleRentalClick = () => {
+    if (user) {
+      router.push("/dashboard/rentals");
+    } else {
+      router.push("/login");
+    }
+  };
+
+  // NEW: Smart Routing for Swaps!
+  const handleSwapClick = () => {
+    if (user) {
+      router.push("/dashboard/swap");
+    } else {
+      router.push("/login");
     }
   };
 
@@ -76,13 +92,10 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ========================================= */}
-      {/* REDESIGNED HERO SECTION (2 COLUMNS)       */}
-      {/* ========================================= */}
+      {/* HERO SECTION */}
       <main className="pt-40 pb-20 px-6 relative z-10 max-w-[1600px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
-          {/* LEFT COLUMN: TEXT & SEARCH */}
           <div className="text-left">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 font-bold text-sm mb-6 border border-orange-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <span className="relative flex h-2 w-2">
@@ -101,17 +114,10 @@ export default function LandingPage() {
               Whether you want to take over a lease, rent a luxury vehicle, secure instant financing, or simply swap your ride.
             </p>
 
-            {/* THE FUNCTIONAL SEARCH FORM */}
-            <form 
-              onSubmit={handleSearch}
-              className="bg-white p-2 rounded-full shadow-2xl shadow-slate-200/60 border border-slate-100 flex items-center max-w-xl mb-12 animate-in fade-in zoom-in-95 duration-1000 delay-150 relative"
-            >
+            <form onSubmit={handleSearch} className="bg-white p-2 rounded-full shadow-2xl shadow-slate-200/60 border border-slate-100 flex items-center max-w-xl mb-12 animate-in fade-in zoom-in-95 duration-1000 delay-150 relative">
               <div className="pl-4 pr-2 text-slate-400"><Search size={24} /></div>
               <input 
-                type="text" 
-                required
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                type="text" required value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search 'Toyota Camry' or 'Lease'..." 
                 className="flex-1 bg-transparent border-none focus:outline-none text-slate-700 h-14 text-base md:text-lg px-2 w-full"
               />
@@ -121,7 +127,6 @@ export default function LandingPage() {
               </button>
             </form>
 
-            {/* Trust Indicators */}
             <div className="flex flex-wrap items-center gap-8 opacity-60 grayscale transition-all hover:grayscale-0 hover:opacity-100 duration-500">
               <div className="flex items-center gap-2 font-bold text-slate-700"><ShieldCheck className="text-green-500" /> Secure Payments</div>
               <div className="flex items-center gap-2 font-bold text-slate-700"><Zap className="text-yellow-500" /> Instant Approvals</div>
@@ -129,21 +134,18 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: GORGEOUS CAR IMAGE */}
           <div className="relative w-full h-[400px] lg:h-[600px] animate-in fade-in slide-in-from-right-8 duration-1000">
-            {/* Soft backdrop blur shape behind the car */}
             <div className="absolute inset-4 bg-gradient-to-tr from-slate-200 to-slate-50 rounded-[3rem] transform rotate-3 shadow-inner"></div>
             <img 
-              src="https://www.bahrainthisweek.com/wp-content/uploads/2021/08/20210713_171857_2-1024x829.jpg" 
+              src="./ctaimg.png" 
               alt="Luxury Sports Car" 
               className="absolute inset-0 w-full h-full object-cover rounded-[3rem] shadow-2xl transform -rotate-2 hover:rotate-0 transition-all duration-700"
             />
-            {/* Floating Price Tag */}
             <div className="absolute -left-4 top-1/4 bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3 animate-bounce shadow-slate-200">
                <div className="w-10 h-10 bg-green-50 text-green-600 rounded-full flex items-center justify-center"><CheckCircle size={20}/></div>
                <div>
-                 <p className="text-xs font-bold text-slate-400 uppercase">Available Now</p>
-                 <p className="font-extrabold text-slate-900">Porsche 911</p>
+                 <p className="text-xs font-bold text-slate-400 uppercase">Sale Now</p>
+                 <p className="font-extrabold text-slate-900">Toyota Raize</p>
                </div>
             </div>
           </div>
@@ -160,21 +162,39 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Top picks this month</h2>
             <p className="text-slate-500 text-lg">Experience the epitome of an amazing journey with our top rentals.</p>
           </div>
-          <button className="hidden md:block text-primary font-bold hover:underline transition-all">View all rentals</button>
+          {/* View All Rentals Button uses smart routing */}
+          <button onClick={handleRentalClick} className="hidden md:block text-primary font-bold hover:underline transition-all">View all rentals</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {TOP_CARS.map((car, index) => (
-            <div key={index} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95" style={{ animationDelay: `${index * 150}ms` }}>
+            <div 
+              key={index} 
+              onClick={handleRentalClick} // Entire card is clickable
+              className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95 flex flex-col" 
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
               <div className="relative h-60 w-full bg-slate-100 overflow-hidden">
                 <img src={car.image} alt={car.model} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-sm">
                   <span className="font-extrabold text-slate-900">{car.price}</span><span className="text-xs font-bold text-slate-500 ml-1">ريال/day</span>
                 </div>
               </div>
-              <div className="p-6">
-                <h3 className="font-bold text-slate-900 text-xl mb-1">{car.make} {car.model}</h3>
-                <p className="text-sm font-medium text-slate-500">{car.year} • Auto • 5 Seats</p>
+              <div className="p-6 flex flex-col flex-1 justify-between">
+                <div>
+                  <h3 className="font-bold text-slate-900 text-xl mb-1">{car.make} {car.model}</h3>
+                  <p className="text-sm font-medium text-slate-500 mb-6">{car.year} • Auto • 5 Seats</p>
+                </div>
+                {/* NEW: Book Now Button uses smart routing */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Stops the card click from firing twice
+                    handleRentalClick();
+                  }} 
+                  className="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors"
+                >
+                  Book Now
+                </button>
               </div>
             </div>
           ))}
@@ -190,12 +210,17 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Available for Swap</h2>
             <p className="text-slate-500 text-lg">Trade your current vehicle for something new.</p>
           </div>
-          <button className="hidden md:block text-purple-600 font-bold hover:underline transition-all">See all swaps</button>
+          {/* See All Swaps Button uses smart routing */}
+          <button onClick={handleSwapClick} className="hidden md:block text-purple-600 font-bold hover:underline transition-all">See all swaps</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {SWAP_CARS.map((car, index) => (
-            <div key={index} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95">
+            <div 
+              key={index} 
+              onClick={handleSwapClick} // Entire card is clickable
+              className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95 flex flex-col"
+            >
               <div className="relative h-56 w-full bg-slate-100 overflow-hidden">
                 <img src={car.image} alt={car.myModel} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute top-4 left-4 bg-purple-600 text-white px-3 py-1.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5">
@@ -203,8 +228,8 @@ export default function LandingPage() {
                 </div>
               </div>
               
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="p-6 flex flex-col flex-1 justify-between">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex-1">
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Offering</p>
                     <h3 className="font-extrabold text-slate-900 text-lg leading-tight">{car.myMake} <br/>{car.myModel}</h3>
@@ -215,13 +240,22 @@ export default function LandingPage() {
                     <h3 className="font-extrabold text-slate-900 text-lg leading-tight">{car.targetMake} <br/>{car.targetType}</h3>
                   </div>
                 </div>
+                {/* NEW: Trade Button uses smart routing */}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSwapClick();
+                  }}
+                  className="w-full bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white font-bold py-3 rounded-xl transition-colors"
+                >
+                  Trade for this
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
-
-      {/* ========================================= */}
+        {/* ========================================= */}
       {/* RENDER YOUR EXISTING COMPONENTS HERE        */}
       {/* ========================================= */}
       {/* Services Section */}
@@ -234,8 +268,6 @@ export default function LandingPage() {
 
       {/* NEW: Footer */}
       <Footer />
-    
-
     </div>
   );
 }
