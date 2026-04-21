@@ -135,6 +135,23 @@ export default function CarRentalsPage() {
         createdAt: new Date(),
       });
 
+      // ==========================================
+      // 3. NEW: TRIGGER THE EMAIL NOTIFICATION! ✉️
+      // ==========================================
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: user.email,
+            userName: user.displayName || "User",
+            serviceType: "Car Rental"
+          })
+        });
+      } catch (emailError) {
+        console.error("Failed to send notification email", emailError);
+      }
+
       // Clear the form and switch to bookings tab
       setSelectedCar(null);
       setLicensePreview(null);

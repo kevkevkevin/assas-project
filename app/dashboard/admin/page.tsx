@@ -18,7 +18,7 @@ export default function AdminPanel() {
   const [dataLoading, setDataLoading] = useState(true);
   const [viewingItem, setViewingItem] = useState<any | null>(null);
 
-  // NEW STATES: For checking the driver's license
+  // STATES: For checking the driver's license
   const [userLicense, setUserLicense] = useState<string | null>(null);
   const [licenseLoading, setLicenseLoading] = useState(false);
   const [licenseChecked, setLicenseChecked] = useState(false);
@@ -60,21 +60,58 @@ export default function AdminPanel() {
     }
   }, [activeTab, role]);
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const updateStatus = async (item: any, newStatus: string) => {
     try {
-      const docRef = doc(db, activeTab, id);
+      const docRef = doc(db, activeTab, item.id);
       await updateDoc(docRef, { status: newStatus });
-      if (viewingItem && viewingItem.id === id) {
+      
+      if (viewingItem && viewingItem.id === item.id) {
         setViewingItem({ ...viewingItem, status: newStatus });
       }
       fetchAllData();
+
+      // ==========================================
+      // AUTOMATED EMAIL TRIGGER
+      // ==========================================
+      if (item.userEmail) {
+        let customMessage = "";
+        let statusText = newStatus;
+
+        if (newStatus === "Approved") {
+          statusText = "Approved! 🎉";
+          customMessage = "Great news! Your request has been officially approved by our team. Please check your dashboard or WhatsApp for the next steps to finalize your vehicle.";
+        } else if (newStatus === "Rejected") {
+           statusText = "Declined ❌";
+           customMessage = "Unfortunately, we could not approve your request at this time. Please contact our support team for more details or to explore other vehicle options.";
+        }
+
+        const serviceTypeMap: any = {
+          leases: "Lease Transfer",
+          rentals: "Car Rental",
+          finance: "Financing Application",
+          swaps: "Car Swap"
+        };
+
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: item.userEmail,
+            userName: item.userName || "Valued Customer",
+            serviceType: serviceTypeMap[activeTab] || "Request",
+            status: statusText,
+            customMessage: customMessage
+          })
+        }).catch(err => console.error("Failed to send admin email", err));
+      }
+
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Failed to update status.");
     }
   };
 
-  // NEW FUNCTION: Fetch the user's license from their main profile
+  // Fetch the user's license from their main profile
   const handleCheckLicense = async () => {
     if (!viewingItem?.userId) return;
     
@@ -182,10 +219,10 @@ export default function AdminPanel() {
                       <button onClick={() => setViewingItem(item)} className="p-2.5 text-slate-400 hover:text-blue-600 bg-white border border-slate-200 hover:border-blue-200 rounded-xl transition-all hover:shadow-sm" title="View Details">
                         <Eye size={18} />
                       </button>
-                      <button onClick={() => updateStatus(item.id, 'Approved')} className="p-2.5 text-slate-400 hover:text-green-600 bg-white border border-slate-200 hover:border-green-200 rounded-xl transition-all hover:shadow-sm" title="Approve">
+                      <button onClick={() => updateStatus(item, 'Approved')} className="p-2.5 text-slate-400 hover:text-green-600 bg-white border border-slate-200 hover:border-green-200 rounded-xl transition-all hover:shadow-sm" title="Approve">
                         <CheckCircle size={18} />
                       </button>
-                      <button onClick={() => updateStatus(item.id, 'Rejected')} className="p-2.5 text-slate-400 hover:text-red-600 bg-white border border-slate-200 hover:border-red-200 rounded-xl transition-all hover:shadow-sm" title="Reject">
+                      <button onClick={() => updateStatus(item, 'Rejected')} className="p-2.5 text-slate-400 hover:text-red-600 bg-white border border-slate-200 hover:border-red-200 rounded-xl transition-all hover:shadow-sm" title="Reject">
                         <XCircle size={18} />
                       </button>
                     </td>
@@ -198,7 +235,7 @@ export default function AdminPanel() {
       </div>
 
       {/* ========================================= */}
-      {/* THE UPDATED "VIEW DETAILS" MODAL WITH LICENSE CHECKER */}
+      {/* THE UPDATED "VIEW DETAILS" MODAL          */}
       {/* ========================================= */}
       {viewingItem && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -213,7 +250,7 @@ export default function AdminPanel() {
               Submitted by <span className="font-bold text-slate-700">{viewingItem.userName}</span>
             </p>
 
-            {/* NEW: DRIVER'S LICENSE VERIFICATION SECTION */}
+            {/* DRIVER'S LICENSE VERIFICATION SECTION */}
             <div className="mb-8 pb-6 border-b border-slate-100">
               <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
                 <ShieldCheck className="text-primary" size={18} /> Driver's License Verification
@@ -237,7 +274,6 @@ export default function AdminPanel() {
                   </span>
                   <div className="w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-100 relative group cursor-pointer">
                      <img src={userLicense} alt="Driver's License" className="w-full h-full object-contain" />
-                     {/* Hover overlay for a sleek look */}
                      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"></div>
                   </div>
                 </div>
@@ -278,10 +314,96 @@ export default function AdminPanel() {
               </div>
             )}
 
+            {/* ========================================= */}
+            {/* NEW: FINANCE ADMIN CONTROLS               */}
+            {/* ========================================= */}
+            {activeTab === 'finance' && viewingItem.status === 'Approved' && (
+              <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <Banknote className="text-primary" size={20} /> Financial Overview & Tracker
+                </h3>
+                
+                {/* Row 1: Financial Numbers */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Outstanding Balance (ريال)</label>
+                    <div className="flex">
+                      <input type="number" id="balanceAdmin" defaultValue={viewingItem.outstandingBalance} className="w-full h-10 px-3 rounded-l-lg border border-slate-300 focus:outline-none" />
+                      <button onClick={async () => {
+                        const val = parseFloat((document.getElementById('balanceAdmin') as HTMLInputElement).value);
+                        await updateDoc(doc(db, "finance", viewingItem.id), { outstandingBalance: val });
+                        alert("Outstanding Balance Updated!");
+                        setViewingItem({...viewingItem, outstandingBalance: val});
+                      }} className="bg-primary text-white px-3 text-sm font-bold rounded-r-lg">Save</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Paid (ريال)</label>
+                    <div className="flex">
+                      <input type="number" id="paidAdmin" defaultValue={viewingItem.totalPaid} className="w-full h-10 px-3 rounded-l-lg border border-slate-300 focus:outline-none" />
+                      <button onClick={async () => {
+                        const val = parseFloat((document.getElementById('paidAdmin') as HTMLInputElement).value);
+                        await updateDoc(doc(db, "finance", viewingItem.id), { totalPaid: val });
+                        alert("Total Paid Updated!");
+                        setViewingItem({...viewingItem, totalPaid: val});
+                      }} className="bg-green-600 hover:bg-green-700 text-white px-3 text-sm font-bold rounded-r-lg">Save</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Time Numbers */}
+                <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-slate-200">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Months Paid</label>
+                    <div className="flex">
+                      <input type="number" id="monthsPaidAdmin" defaultValue={viewingItem.monthsPaid} className="w-full h-10 px-3 rounded-l-lg border border-slate-300 focus:outline-none" />
+                      <button onClick={async () => {
+                        const val = parseInt((document.getElementById('monthsPaidAdmin') as HTMLInputElement).value);
+                        await updateDoc(doc(db, "finance", viewingItem.id), { monthsPaid: val });
+                        alert("Months Updated!");
+                        setViewingItem({...viewingItem, monthsPaid: val});
+                      }} className="bg-slate-700 text-white px-3 text-sm font-bold rounded-r-lg">Save</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Remaining Months</label>
+                    <div className="flex">
+                      <input type="number" id="remMonthsAdmin" defaultValue={viewingItem.remainingMonths} className="w-full h-10 px-3 rounded-l-lg border border-slate-300 focus:outline-none" />
+                      <button onClick={async () => {
+                        const val = parseInt((document.getElementById('remMonthsAdmin') as HTMLInputElement).value);
+                        await updateDoc(doc(db, "finance", viewingItem.id), { remainingMonths: val });
+                        alert("Months Updated!");
+                        setViewingItem({...viewingItem, remainingMonths: val});
+                      }} className="bg-slate-700 text-white px-3 text-sm font-bold rounded-r-lg">Save</button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 3: Upload Receipt */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Upload New Receipt (PDF)</label>
+                  <input type="file" accept=".pdf,image/*" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = async () => {
+                        const newReceipt = { date: new Date().toLocaleDateString(), fileName: file.name, fileData: reader.result };
+                        const updatedReceipts = [...(viewingItem.receipts || []), newReceipt];
+                        await updateDoc(doc(db, "finance", viewingItem.id), { receipts: updatedReceipts });
+                        alert("Receipt Uploaded & Sent to User Dashboard!");
+                        setViewingItem({...viewingItem, receipts: updatedReceipts});
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
+                </div>
+              </div>
+            )}
+
             {/* DYNAMIC DATA GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 mb-8">
               {Object.entries(viewingItem).map(([key, value]) => {
-                if (key === 'id' || key === 'userId' || key === 'image' || key === 'createdAt' || key === 'userEmail' || key === 'contactNumber') return null;
+                if (key === 'id' || key === 'userId' || key === 'image' || key === 'createdAt' || key === 'userEmail' || key === 'contactNumber' || key === 'receipts') return null;
                 const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
                 return (
                   <div key={key}>
@@ -294,10 +416,10 @@ export default function AdminPanel() {
 
             {/* APPROVE/REJECT BUTTONS */}
             <div className="flex gap-4 pt-6 border-t border-slate-100">
-              <button onClick={() => updateStatus(viewingItem.id, 'Approved')} className="flex-1 py-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => updateStatus(viewingItem, 'Approved')} className="flex-1 py-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
                 <CheckCircle size={18} /> Approve
               </button>
-              <button onClick={() => updateStatus(viewingItem.id, 'Rejected')} className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+              <button onClick={() => updateStatus(viewingItem, 'Rejected')} className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
                 <XCircle size={18} /> Reject
               </button>
             </div>
