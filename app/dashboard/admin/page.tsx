@@ -4,10 +4,11 @@ import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { ShieldCheck, CheckCircle, XCircle, Eye, FileText, CarFront, Banknote, ArrowRightLeft, X, MessageCircle, Phone, Mail, Clock, AlertCircle } from "lucide-react";
+import { ShieldCheck, CheckCircle, XCircle, Eye, FileText, CarFront, Banknote, ArrowRightLeft, X, MessageCircle, Phone, Mail, Clock, AlertCircle, Wrench } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-type TabType = 'leases' | 'rentals' | 'finance' | 'swaps';
+// ADDED 'maintenance' to the tabs
+type TabType = 'leases' | 'rentals' | 'finance' | 'swaps' | 'maintenance';
 
 export default function AdminPanel() {
   const { user, role, loading } = useAuth();
@@ -18,7 +19,6 @@ export default function AdminPanel() {
   const [dataLoading, setDataLoading] = useState(true);
   const [viewingItem, setViewingItem] = useState<any | null>(null);
 
-  // STATES: For checking the driver's license
   const [userLicense, setUserLicense] = useState<string | null>(null);
   const [licenseLoading, setLicenseLoading] = useState(false);
   const [licenseChecked, setLicenseChecked] = useState(false);
@@ -29,7 +29,6 @@ export default function AdminPanel() {
     }
   }, [role, loading, router]);
 
-  // Reset the license viewer whenever you close or change the modal
   useEffect(() => {
     if (!viewingItem) {
       setUserLicense(null);
@@ -70,26 +69,25 @@ export default function AdminPanel() {
       }
       fetchAllData();
 
-      // ==========================================
       // AUTOMATED EMAIL TRIGGER
-      // ==========================================
       if (item.userEmail) {
         let customMessage = "";
         let statusText = newStatus;
 
         if (newStatus === "Approved") {
           statusText = "Approved! 🎉";
-          customMessage = "Great news! Your request has been officially approved by our team. Please check your dashboard or WhatsApp for the next steps to finalize your vehicle.";
+          customMessage = "Great news! Your request has been officially approved by our team. Please check your dashboard or WhatsApp for the next steps.";
         } else if (newStatus === "Rejected") {
            statusText = "Declined ❌";
-           customMessage = "Unfortunately, we could not approve your request at this time. Please contact our support team for more details or to explore other vehicle options.";
+           customMessage = "Unfortunately, we could not approve your request at this time. Please contact our support team for more details.";
         }
 
         const serviceTypeMap: any = {
           leases: "Lease Transfer",
           rentals: "Car Rental",
           finance: "Financing Application",
-          swaps: "Car Swap"
+          swaps: "Car Swap",
+          maintenance: "Car Maintenance Service" // Added Maintenance Map
         };
 
         fetch('/api/send-email', {
@@ -111,15 +109,12 @@ export default function AdminPanel() {
     }
   };
 
-  // Fetch the user's license from their main profile
   const handleCheckLicense = async () => {
     if (!viewingItem?.userId) return;
-    
     setLicenseLoading(true);
     try {
       const userDocRef = doc(db, "users", viewingItem.userId);
       const userDoc = await getDoc(userDocRef);
-      
       if (userDoc.exists() && userDoc.data().driversLicense) {
         setUserLicense(userDoc.data().driversLicense);
       } else {
@@ -139,8 +134,10 @@ export default function AdminPanel() {
     switch (activeTab) {
       case 'leases': return <><p className="font-bold text-slate-700">{item.make} {item.model} ({item.year})</p><p className="text-xs text-slate-500">Payment: {item.monthlyPayment} ريال/mo</p></>;
       case 'rentals': return <><p className="font-bold text-slate-700">{item.make} {item.model} ({item.year})</p><p className="text-xs text-slate-500">Price: {item.dailyPrice} ريال/day</p></>;
-      case 'finance': return <><p className="font-bold text-slate-700">{item.carModel}</p><p className="text-xs text-slate-500">Est. Payment: {item.estimatedMonthly} ريال/mo</p></>;
+      case 'finance': return <><p className="font-bold text-slate-700">{item.carModel}</p><p className="text-xs text-slate-500">Est. Payment: {item.estimatedMonthly || item.price} ريال</p></>;
       case 'swaps': return <><p className="font-bold text-slate-700">Has: {item.myMake} {item.myModel}</p><p className="text-xs text-purple-600 font-medium mt-0.5">Wants: {item.targetMake || 'Any'} {item.targetType || 'Any'}</p></>;
+      // ADDED Maintenance Table View
+      case 'maintenance': return <><p className="font-bold text-slate-700">{item.carMake} {item.carModel} ({item.year})</p><p className="text-xs text-slate-500 line-clamp-1">{item.message}</p></>;
     }
   };
 
@@ -169,6 +166,10 @@ export default function AdminPanel() {
         </button>
         <button onClick={() => setActiveTab('swaps')} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'swaps' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
           <ArrowRightLeft size={16} /> Swaps
+        </button>
+        {/* ADDED Maintenance Tab */}
+        <button onClick={() => setActiveTab('maintenance')} className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'maintenance' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>
+          <Wrench size={16} /> Maintenance
         </button>
       </div>
 
@@ -209,7 +210,7 @@ export default function AdminPanel() {
                       <span className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
                         item.status === 'Approved' || item.status === 'Active' ? 'bg-green-50 text-green-600 border-green-100' : 
                         item.status === 'Rejected' ? 'bg-red-50 text-red-600 border-red-100' : 
-                        item.status === 'Reviewing Matches' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                        item.status === 'Pending Review' || item.status === 'Reviewing Matches' ? 'bg-purple-50 text-purple-600 border-purple-100' :
                         'bg-orange-50 text-orange-600 border-orange-100'
                       }`}>
                         {item.status || "Under Review"}
@@ -245,44 +246,45 @@ export default function AdminPanel() {
               <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-bold text-slate-900 mb-2 capitalize">{activeTab.slice(0, -1)} Request Details</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2 capitalize">{activeTab === 'maintenance' ? 'Service' : activeTab.slice(0, -1)} Request Details</h2>
             <p className="text-slate-500 text-sm mb-6 pb-6 border-b border-slate-100">
               Submitted by <span className="font-bold text-slate-700">{viewingItem.userName}</span>
             </p>
 
-            {/* DRIVER'S LICENSE VERIFICATION SECTION */}
-            <div className="mb-8 pb-6 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <ShieldCheck className="text-primary" size={18} /> Driver's License Verification
-              </h3>
-              
-              {!licenseChecked && !licenseLoading ? (
-                <button 
-                  onClick={handleCheckLicense}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 w-fit"
-                >
-                  <FileText size={18} /> Check User's Driver's License
-                </button>
-              ) : licenseLoading ? (
-                <div className="text-sm text-slate-500 flex items-center gap-2 font-medium">
-                  <Clock className="animate-spin text-primary" size={18} /> Fetching secure file...
-                </div>
-              ) : userLicense ? (
-                <div className="animate-in fade-in slide-in-from-top-2">
-                  <span className="inline-block bg-green-50 text-green-600 px-3 py-1 rounded-lg text-xs font-bold mb-3 border border-green-100">
-                    <CheckCircle size={14} className="inline mr-1" /> Verified on File
-                  </span>
-                  <div className="w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-100 relative group cursor-pointer">
-                     <img src={userLicense} alt="Driver's License" className="w-full h-full object-contain" />
-                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"></div>
+            {/* DRIVER'S LICENSE VERIFICATION SECTION (Hide for maintenance as it's not strictly necessary, but good to have) */}
+            {activeTab !== 'maintenance' && (
+              <div className="mb-8 pb-6 border-b border-slate-100">
+                <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <ShieldCheck className="text-primary" size={18} /> Driver's License Verification
+                </h3>
+                
+                {!licenseChecked && !licenseLoading ? (
+                  <button 
+                    onClick={handleCheckLicense}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 w-fit"
+                  >
+                    <FileText size={18} /> Check User's Driver's License
+                  </button>
+                ) : licenseLoading ? (
+                  <div className="text-sm text-slate-500 flex items-center gap-2 font-medium">
+                    <Clock className="animate-spin text-primary" size={18} /> Fetching secure file...
                   </div>
-                </div>
-              ) : (
-                <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-2">
-                   <AlertCircle size={18} className="text-slate-400" /> No driver's license found on this user's profile.
-                </div>
-              )}
-            </div>
+                ) : userLicense ? (
+                  <div className="animate-in fade-in slide-in-from-top-2">
+                    <span className="inline-block bg-green-50 text-green-600 px-3 py-1 rounded-lg text-xs font-bold mb-3 border border-green-100">
+                      <CheckCircle size={14} className="inline mr-1" /> Verified on File
+                    </span>
+                    <div className="w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-200 bg-slate-100 relative group cursor-pointer">
+                       <img src={userLicense} alt="Driver's License" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-slate-500 bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center gap-2">
+                     <AlertCircle size={18} className="text-slate-400" /> No driver's license found on this user's profile.
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* CONTACT ACTION BUTTONS */}
             <div className="flex flex-wrap gap-3 mb-8 pb-6 border-b border-slate-100">
@@ -307,23 +309,34 @@ export default function AdminPanel() {
               </a>
             </div>
 
-            {/* CAR IMAGES (For Swaps) */}
-            {viewingItem.image && (
+            {/* ADDED: MULTIPLE IMAGES FOR MAINTENANCE */}
+            {activeTab === 'maintenance' && viewingItem.images && viewingItem.images.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Uploaded Photos</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {viewingItem.images.map((img: string, idx: number) => (
+                    <div key={idx} className="h-32 rounded-xl overflow-hidden border border-slate-200">
+                      <img src={img} alt={`Issue ${idx + 1}`} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SINGLE CAR IMAGE (For Swaps) */}
+            {activeTab !== 'maintenance' && viewingItem.image && (
               <div className="mb-6 w-full h-64 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                 <img src={viewingItem.image} alt="Uploaded car" className="w-full h-full object-cover" />
               </div>
             )}
 
-            {/* ========================================= */}
-            {/* NEW: FINANCE ADMIN CONTROLS               */}
-            {/* ========================================= */}
+            {/* FINANCE ADMIN CONTROLS */}
             {activeTab === 'finance' && viewingItem.status === 'Approved' && (
               <div className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200">
                 <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                   <Banknote className="text-primary" size={20} /> Financial Overview & Tracker
                 </h3>
                 
-                {/* Row 1: Financial Numbers */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Outstanding Balance (ريال)</label>
@@ -351,7 +364,6 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                {/* Row 2: Time Numbers */}
                 <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-slate-200">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Months Paid</label>
@@ -379,7 +391,6 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                {/* Row 3: Upload Receipt */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Upload New Receipt (PDF)</label>
                   <input type="file" accept=".pdf,image/*" onChange={(e) => {
@@ -401,14 +412,14 @@ export default function AdminPanel() {
             )}
 
             {/* DYNAMIC DATA GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 mb-8">
+            <div className={`grid grid-cols-1 ${activeTab === 'maintenance' ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-y-6 gap-x-8 mb-8`}>
               {Object.entries(viewingItem).map(([key, value]) => {
-                if (key === 'id' || key === 'userId' || key === 'image' || key === 'createdAt' || key === 'userEmail' || key === 'contactNumber' || key === 'receipts') return null;
+                if (key === 'id' || key === 'userId' || key === 'image' || key === 'images' || key === 'createdAt' || key === 'userEmail' || key === 'contactNumber' || key === 'receipts') return null;
                 const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
                 return (
                   <div key={key}>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{formattedKey}</p>
-                    <p className="font-medium text-slate-900 text-lg">{String(value) || "N/A"}</p>
+                    <p className="font-medium text-slate-900 text-lg whitespace-pre-wrap">{String(value) || "N/A"}</p>
                   </div>
                 );
               })}
@@ -417,7 +428,7 @@ export default function AdminPanel() {
             {/* APPROVE/REJECT BUTTONS */}
             <div className="flex gap-4 pt-6 border-t border-slate-100">
               <button onClick={() => updateStatus(viewingItem, 'Approved')} className="flex-1 py-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
-                <CheckCircle size={18} /> Approve
+                <CheckCircle size={18} /> {activeTab === 'maintenance' ? 'Approve Service' : 'Approve'}
               </button>
               <button onClick={() => updateStatus(viewingItem, 'Rejected')} className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
                 <XCircle size={18} /> Reject

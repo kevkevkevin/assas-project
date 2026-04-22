@@ -1,22 +1,23 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CarFront, FileText, Banknote, ArrowRightLeft, ShieldCheck, LogOut, X } from "lucide-react";
+import { LayoutDashboard, CarFront, FileText, Banknote, ArrowRightLeft, ShieldCheck, LogOut, X, Wrench } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
 
-// Notice we added a new 'onClose' property here!
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { user, role } = useAuth();
 
+  // ADDED: Maintenance is now safely inside the menu array!
   const menuItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
     { name: "Car Rentals", icon: <CarFront size={20} />, path: "/dashboard/rentals" },
     { name: "Lease Transfer", icon: <FileText size={20} />, path: "/dashboard/lease" },
     { name: "Financing", icon: <Banknote size={20} />, path: "/dashboard/finance" },
     { name: "Car Swap", icon: <ArrowRightLeft size={20} />, path: "/dashboard/swap" },
+    { name: "Maintenance", icon: <Wrench size={20} />, path: "/dashboard/maintenance" },
   ];
 
   if (role === "admin") {
