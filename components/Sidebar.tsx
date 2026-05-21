@@ -25,7 +25,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <aside className="w-64 h-screen bg-[#0f172a] text-white flex flex-col justify-between overflow-y-auto">
+    <aside className="w-64 h-screen bg-secondary text-white flex flex-col justify-between overflow-y-auto">
       <div>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -54,8 +54,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
                 onClick={onClose} // Closes the sidebar on mobile when you click a link!
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${
                   isActive 
-                    ? "bg-primary/10 text-primary border border-primary/20" 
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    ? "bg-primary/60 text-white " 
+                    : "text-slate-400 hover:bg-primary/10 hover:text-white"
                 }`}
               >
                 {item.icon}

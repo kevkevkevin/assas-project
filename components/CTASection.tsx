@@ -23,7 +23,7 @@ export default function CTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="bg-primary hover:bg-secondary text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg shadow-orange-500/30 transition-all transform hover:scale-105">
+          <button className="bg-primary hover:bg-secondary text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg shadow-blue-500/30 transition-all transform hover:scale-105">
             Get Started Now
           </button>
           

@@ -69,7 +69,12 @@ export default function LandingPage() {
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
               <CarFront size={22} />
             </div>
-            <span className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight hidden sm:block">AutoSettle</span>
+           {/*  <span className="text-l md:text2xl font-extrabold text-slate-900 tracking-tight hidden sm:block"><br/>
+</span> */}
+            <div>
+              <h1 className="text-xl text-primary font-bold tracking-tight">مسارات</h1>
+              <p className="text-[12px] text-primary tracking-wider uppercase"> التبديل التجارية</p>
+            </div>
           </Link>
 
           <div>
@@ -97,17 +102,17 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
           <div className="text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 font-bold text-sm mb-6 border border-orange-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-blue-600 font-bold text-sm mb-6 border border-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
               Saudi Arabia's #1 Settlement Platform
             </div>
 
             <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold text-slate-900 tracking-tight mb-6 leading-[1.1] animate-in fade-in slide-in-from-bottom-6 duration-700">
               Find your perfect car, <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">without the hassle.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">without the hassle.</span>
             </h1>
             
             <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-xl leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -262,9 +267,7 @@ export default function LandingPage() {
       <Services />
 
       {/* CTA Section */}
-      <FadeIn delay={0.3} direction="up" fullWidth>
-        <CTASection />
-      </FadeIn>
+      <CTASection />
 
       {/* NEW: Footer */}
       <Footer />

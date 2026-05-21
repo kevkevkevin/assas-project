@@ -2,14 +2,15 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: '#f5b11e',
-        secondary: '#e1870d',
+        primary: "#0B4FB6",   // Your vibrant royal blue
+        secondary: "#121E5B", // Your deep navy blue
       },
       animation: {
         blob: "blob 7s infinite", // <--- The new animation rule

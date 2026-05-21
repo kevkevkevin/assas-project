@@ -43,10 +43,10 @@ export default function Services() {
           {services.map((service, index) => (
             <div 
               key={index} 
-              className="group p-8 rounded-3xl border border-gray-100 hover:border-primary/20 hover:shadow-xl hover:shadow-orange-50 transition-all duration-300 bg-white"
+              className="group p-8 rounded-3xl border border-gray-100 hover:border-primary/20 hover:shadow-xl hover:shadow-blue-50 transition-all duration-300 bg-white"
             >
-              {/* Icon Circle - Orange Background */}
-              <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform">
+              {/* Icon Circle - blue Background */}
+              <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
                 {service.icon}
               </div>
               
@@ -83,7 +83,7 @@ export default function Services() {
            </div>
            
            <div className="relative z-10">
-              <button className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-orange-900/20 transition-transform hover:scale-105 flex items-center gap-2">
+              <button className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-blue-900/20 transition-transform hover:scale-105 flex items-center gap-2">
                  <ShieldCheck size={20} />
                  Verify My Account
               </button>
