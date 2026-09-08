@@ -5,9 +5,14 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { Wrench, Plus, CarFront, Phone, MessageSquare, UploadCloud, X, Clock, CheckCircle } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../../../context/LanguageContext";
 
 export default function MaintenancePage() {
   const { user } = useAuth();
+  // 2. INITIALIZE TRANSLATION ENGINE
+  const { t } = useLanguage();
+
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<'list' | 'form'>('list');
@@ -51,7 +56,7 @@ export default function MaintenancePage() {
     const files = Array.from(e.target.files || []);
     
     if (images.length + files.length > 3) {
-      alert("You can only upload a maximum of 3 images.");
+      alert(t("maxImagesAlert"));
       return;
     }
 
@@ -106,16 +111,16 @@ export default function MaintenancePage() {
 
     } catch (error) {
       console.error("Error submitting maintenance request:", error);
-      alert("Failed to submit request.");
+      alert(t("failedToSubmitReq"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputStyles = "w-full input input-bordered bg-slate-50 text-slate-900 h-12 rounded-xl focus:border-primary focus:outline-none px-4 border-slate-200";
+  const inputStyles = "w-full input input-bordered bg-slate-50 text-slate-900 h-12 rounded-xl focus:border-primary focus:outline-none px-4 border-slate-200 rtl:text-right placeholder:text-slate-400";
 
   return (
-    <div className="max-w-7xl mx-auto pb-10">
+    <div className="max-w-7xl mx-auto pb-10 text-start">
       
       {view === 'list' && (
         <div className="animate-in fade-in duration-300">
@@ -125,27 +130,27 @@ export default function MaintenancePage() {
                 <div className="w-12 h-12 bg-slate-900 text-primary flex items-center justify-center rounded-2xl shadow-lg shadow-slate-900/20">
                   <Wrench size={24} />
                 </div>
-                Maintenance & Service
+                {t("maintenanceTitle")}
               </h1>
-              <p className="text-slate-500 mt-2">Book a repair, inspection, or routine service for your vehicle.</p>
+              <p className="text-slate-500 mt-2">{t("maintenanceSubtitle")}</p>
             </div>
             <button onClick={() => setView('form')} className="bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-all flex items-center gap-2">
-              <Plus size={20} /> Request Service
+              <Plus size={20} /> {t("requestServiceBtn")}
             </button>
           </div>
 
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
             {loading ? (
               <div className="flex items-center justify-center h-[400px] text-slate-400 font-medium">
-                <Clock className="animate-spin mr-2" size={20} /> Loading requests...
+                <Clock className="animate-spin ltr:mr-2 rtl:ml-2" size={20} /> {t("loadingRequests")}
               </div>
             ) : requests.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[400px] text-center px-6">
                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
                   <Wrench size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No Service Requests</h3>
-                <p className="text-slate-500 max-w-sm mx-auto">Keep your car in top shape. Click the button above to schedule your first maintenance appointment.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{t("noServiceReqs")}</h3>
+                <p className="text-slate-500 max-w-sm mx-auto">{t("noServiceReqsDesc")}</p>
               </div>
             ) : (
               <div className="divide-y divide-slate-50">
@@ -166,10 +171,11 @@ export default function MaintenancePage() {
                     </div>
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       <span className={`px-4 py-1.5 rounded-lg text-xs font-bold border ${req.status === 'Approved' ? 'bg-green-50 text-green-600 border-green-100' : req.status === 'Rejected' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>
-                        {req.status}
+                        {/* Translate standard "Pending Review" status if it matches */}
+                        {req.status === "Pending Review" ? t("underReview") : req.status}
                       </span>
                       <span className="text-xs text-slate-400 font-medium">
-                        {req.createdAt?.seconds ? new Date(req.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
+                        {req.createdAt?.seconds ? new Date(req.createdAt.seconds * 1000).toLocaleDateString() : t("justNow")}
                       </span>
                     </div>
                   </div>
@@ -184,10 +190,10 @@ export default function MaintenancePage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Request Maintenance</h1>
-              <p className="text-slate-500 mt-1">Provide details and photos so our team can assess the issue.</p>
+              <h1 className="text-3xl font-bold text-slate-900">{t("reqMaintenanceTitle")}</h1>
+              <p className="text-slate-500 mt-1">{t("reqMaintenanceSubtitle")}</p>
             </div>
-            <button onClick={() => setView('list')} className="text-primary font-bold hover:underline">Cancel Request</button>
+            <button onClick={() => setView('list')} className="text-primary font-bold hover:underline">{t("cancelRequest")}</button>
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 space-y-8">
@@ -195,20 +201,20 @@ export default function MaintenancePage() {
             {/* 1. Vehicle Details */}
             <div>
               <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                <CarFront className="text-primary" size={20} /> 1. Vehicle Information
+                <CarFront className="text-primary" size={20} /> {t("step1VehicleInfo")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Make *</label>
-                  <input type="text" required value={formData.carMake} onChange={e => setFormData({...formData, carMake: e.target.value})} placeholder="e.g. Toyota" className={inputStyles} />
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("makeReq")}</label>
+                  <input type="text" required value={formData.carMake} onChange={e => setFormData({...formData, carMake: e.target.value})} placeholder={t("egToyota")} className={inputStyles} />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Model *</label>
-                  <input type="text" required value={formData.carModel} onChange={e => setFormData({...formData, carModel: e.target.value})} placeholder="e.g. Camry" className={inputStyles} />
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("modelReq")}</label>
+                  <input type="text" required value={formData.carModel} onChange={e => setFormData({...formData, carModel: e.target.value})} placeholder={t("egCamry")} className={inputStyles} />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Year *</label>
-                  <input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="e.g. 2021" className={inputStyles} />
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("yearReq")}</label>
+                  <input type="number" required value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} placeholder="2024" className={inputStyles} />
                 </div>
               </div>
             </div>
@@ -216,30 +222,30 @@ export default function MaintenancePage() {
             {/* 2. Contact Details */}
             <div>
               <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                <Phone className="text-primary" size={20} /> 2. Contact Number
+                <Phone className="text-primary" size={20} /> {t("step2ContactInfo")}
               </h3>
               <div className="max-w-md">
-                <label className="block text-sm font-bold text-slate-700 mb-1">WhatsApp Number *</label>
-                <input type="tel" required value={formData.contactNumber} onChange={e => setFormData({...formData, contactNumber: e.target.value})} placeholder="+966 50 123 4567" className={inputStyles} />
-                <p className="text-xs text-slate-400 mt-2">Our service team will contact you here to schedule the appointment.</p>
+                <label className="block text-sm font-bold text-slate-700 mb-1">{t("mobileNumber")}</label>
+                <input type="tel" required value={formData.contactNumber} onChange={e => setFormData({...formData, contactNumber: e.target.value})} placeholder="+966 50 123 4567" className={inputStyles} dir="ltr" />
+                <p className="text-xs text-slate-400 mt-2">{t("contactTeamSubtitle")}</p>
               </div>
             </div>
 
             {/* 3. Issue Description & Photos */}
             <div>
               <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                <MessageSquare className="text-primary" size={20} /> 3. Issue Details & Photos
+                <MessageSquare className="text-primary" size={20} /> {t("step3IssueDetails")}
               </h3>
               
               <div className="mb-6">
-                <label className="block text-sm font-bold text-slate-700 mb-1">Describe the problem or service needed *</label>
-                <textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder="E.g., I need a 10,000km routine service, or there is a scratch on the left door..." className="w-full textarea textarea-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-4 min-h-[120px] border-slate-200" />
+                <label className="block text-sm font-bold text-slate-700 mb-1">{t("describeProblem")}</label>
+                <textarea required value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder={t("issuePlaceholder")} className="w-full textarea textarea-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-4 min-h-[120px] border-slate-200 rtl:text-right" />
               </div>
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2 flex justify-between">
-                  Upload Photos (Optional) 
-                  <span className="text-slate-400 font-normal">{images.length}/3 uploaded</span>
+                  {t("uploadPhotosOptional")}
+                  <span className="text-slate-400 font-normal">{images.length}/3 {t("uploaded")}</span>
                 </label>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -257,7 +263,7 @@ export default function MaintenancePage() {
                   {images.length < 3 && (
                     <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 bg-slate-50 rounded-2xl cursor-pointer hover:bg-orange-50 hover:border-primary hover:text-primary text-slate-400 transition-colors">
                       <UploadCloud size={24} className="mb-2" />
-                      <span className="text-xs font-bold">Add Photo</span>
+                      <span className="text-xs font-bold">{t("addPhoto")}</span>
                       <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} />
                     </label>
                   )}
@@ -266,7 +272,7 @@ export default function MaintenancePage() {
             </div>
 
             <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-primary hover:bg-secondary text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50">
-              {isSubmitting ? "Submitting Request..." : "Submit Maintenance Request"}
+              {isSubmitting ? t("submittingReq") : t("submitMaintenanceReq")}
             </button>
 
           </form>

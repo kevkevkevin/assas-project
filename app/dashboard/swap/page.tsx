@@ -5,8 +5,10 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { Plus, Clock, ArrowLeft, ArrowRightLeft, CarFront, Search, UploadCloud, X, Phone, ShieldCheck } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../../../context/LanguageContext";
 
-// NEW: AutoSettle Certified Inventory for Swapping!
+// AutoSettle Certified Inventory for Swapping!
 const AUTOSETTLE_INVENTORY = [
   { id: "as1", make: "Porsche", model: "Macan", year: "2023", type: "SUV", value: "320,000 ريال", image: "https://images.unsplash.com/photo-1503376712344-652d0f4ca4f5?auto=format&fit=crop&q=80&w=800" },
   { id: "as2", make: "Mercedes-Benz", model: "G-Class", year: "2022", type: "SUV", value: "650,000 ريال", image: "https://images.unsplash.com/photo-1520031441872-265e4ff70366?auto=format&fit=crop&q=80&w=800" },
@@ -18,6 +20,9 @@ const AUTOSETTLE_INVENTORY = [
 
 export default function CarSwapPage() {
   const { user } = useAuth();
+  // 2. INITIALIZE TRANSLATION ENGINE
+  const { t } = useLanguage();
+
   const [swaps, setSwaps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -65,13 +70,12 @@ export default function CarSwapPage() {
     fetchMySwaps();
   }, [user]);
 
-  // NEW: Pre-fill the form when they click an AutoSettle car!
   const handleInitiateTrade = (car: any) => {
     setFormData({
       ...formData,
       targetMake: `${car.make} ${car.model}`,
       targetType: car.type,
-      notes: `I am interested in trading my car for the AutoSettle Certified ${car.year} ${car.make} ${car.model}.`
+      notes: `${t("interestedInTrading")} ${car.year} ${car.make} ${car.model}.`
     });
     setView('form');
   };
@@ -102,37 +106,37 @@ export default function CarSwapPage() {
       fetchMySwaps(); 
     } catch (error) {
       console.error("Error creating swap:", error);
-      alert("Failed to submit request.");
+      alert(t("failedToSubmitSwap"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputStyles = "w-full input input-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 h-12 rounded-xl focus:border-primary focus:outline-none px-4 border-slate-200";
+  const inputStyles = "w-full input input-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 h-12 rounded-xl focus:border-primary focus:outline-none px-4 border-slate-200 rtl:text-right";
   const selectStyles = "w-full select select-bordered bg-slate-50 text-slate-900 h-12 rounded-xl focus:border-primary focus:outline-none px-4 border-slate-200 font-normal";
 
   return (
-    <div className="max-w-7xl mx-auto pb-10">
+    <div className="max-w-7xl mx-auto pb-10 text-start">
       
       {view === 'list' && (
         <div className="animate-in fade-in duration-300">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Car Swap</h1>
-              <p className="text-slate-500 mt-1">Trade your vehicle instantly with AutoSettle or the community.</p>
+              <h1 className="text-3xl font-bold text-slate-900">{t("carSwapTitle")}</h1>
+              <p className="text-slate-500 mt-1">{t("carSwapSubtitle")}</p>
             </div>
             <button onClick={() => setView('form')} className="bg-primary hover:bg-secondary text-white px-6 py-3 rounded-xl font-bold shadow-md shadow-orange-500/20 transition-all flex items-center gap-2">
-              <Plus size={20} /> Propose Custom Swap
+              <Plus size={20} /> {t("proposeCustomSwap")}
             </button>
           </div>
 
           {/* ========================================= */}
-          {/* NEW: AUTOSETTLE CERTIFIED INVENTORY         */}
+          {/* AUTOSETTLE CERTIFIED INVENTORY              */}
           {/* ========================================= */}
           <div className="mb-12">
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <ShieldCheck className="text-primary" size={24} /> AutoSettle Certified Swaps
+              <ShieldCheck className="text-primary" size={24} /> {t("certifiedSwapsTitle")}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -140,19 +144,19 @@ export default function CarSwapPage() {
                 <div key={car.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group">
                   <div className="relative h-48 w-full bg-slate-100 overflow-hidden">
                     <img src={car.image} alt={car.model} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 border border-slate-100">
+                    <div className="absolute top-3 ltr:left-3 rtl:right-3 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 border border-slate-100">
                       <ShieldCheck size={14} className="text-green-500" />
-                      <span className="text-xs font-bold text-slate-900">Certified</span>
+                      <span className="text-xs font-bold text-slate-900">{t("certifiedBadge")}</span>
                     </div>
                   </div>
                   <div className="p-5">
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <h3 className="font-extrabold text-slate-900 text-lg mb-0.5">{car.make} {car.model}</h3>
-                        <p className="text-sm font-medium text-slate-500">{car.year} • {car.type}</p>
+                        <p className="text-sm font-medium text-slate-500">{car.year} • {t(car.type.toLowerCase() as any) || car.type}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Est. Value</p>
+                      <div className="text-end">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t("estValue")}</p>
                         <p className="font-bold text-primary">{car.value}</p>
                       </div>
                     </div>
@@ -160,7 +164,7 @@ export default function CarSwapPage() {
                       onClick={() => handleInitiateTrade(car)}
                       className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
-                      <ArrowRightLeft size={18} /> Trade for this
+                      <ArrowRightLeft size={18} /> {t("tradeForThisBtn")}
                     </button>
                   </div>
                 </div>
@@ -173,22 +177,22 @@ export default function CarSwapPage() {
           {/* ========================================= */}
           <div>
             <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <Clock className="text-slate-400" size={24} /> My Swap Proposals
+              <Clock className="text-slate-400" size={24} /> {t("mySwapProposalsTitle")}
             </h2>
             
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[300px]">
               {loading ? (
                 <div className="flex items-center justify-center h-[300px] text-slate-400 font-medium">
-                  <Clock className="animate-spin mr-2" size={20} /> Loading your swap listings...
+                  <Clock className="animate-spin ltr:mr-2 rtl:ml-2" size={20} /> {t("loadingSwapListings")}
                 </div>
               ) : swaps.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[300px] text-center px-6">
                   <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 mb-4">
                     <ArrowRightLeft size={28} />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">No active swap requests</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">{t("noActiveSwapRequests")}</h3>
                   <p className="text-slate-500 text-sm max-w-sm mx-auto mb-6">
-                    Pick a car from the certified inventory above or propose a custom trade!
+                    {t("noSwapRequestsDesc")}
                   </p>
                 </div>
               ) : (
@@ -206,7 +210,7 @@ export default function CarSwapPage() {
                           </div>
                         )}
                         <div>
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Offering</p>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t("offeringLabel")}</p>
                           <h3 className="font-bold text-slate-900 text-lg">{swap.myMake} {swap.myModel}</h3>
                           <p className="text-sm text-slate-500">{swap.myYear} • {swap.myMileage} km</p>
                         </div>
@@ -219,14 +223,14 @@ export default function CarSwapPage() {
                           <Search size={28} />
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Looking For</p>
-                          <h3 className="font-bold text-slate-900 text-lg">{swap.targetMake || "Any Brand"}</h3>
-                          <p className="text-sm text-slate-500">{swap.targetType || "Any Body Type"}</p>
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t("lookingForLabel")}</p>
+                          <h3 className="font-bold text-slate-900 text-lg">{swap.targetMake || t("anyBrand")}</h3>
+                          <p className="text-sm text-slate-500">{t(swap.targetType?.toLowerCase()) || swap.targetType || t("anyBodyType")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4 shrink-0">
                         <span className={`px-3 py-1 rounded-md text-xs font-bold border ${swap.status === 'Approved' ? 'bg-green-50 text-green-600 border-green-100' : swap.status === 'Rejected' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-purple-50 text-purple-600 border-purple-100'}`}>
-                          {swap.status}
+                          {swap.status === "Reviewing Matches" ? t("reviewingMatches") : swap.status}
                         </span>
                       </div>
                     </div>
@@ -244,45 +248,45 @@ export default function CarSwapPage() {
       {view === 'form' && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
           <button onClick={() => {setView('list'); setFormData({...formData, targetMake: "", targetType: "", notes: ""})}} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-medium mb-6 transition-colors">
-            <ArrowLeft size={20} /> Back to swaps
+            <ArrowLeft size={20} className="rtl:rotate-180" /> {t("backToSwaps")}
           </button>
 
           <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8">Propose a Car Swap</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">{t("proposeCarSwapTitle")}</h2>
 
             <form onSubmit={handleCreateSwap} className="space-y-10">
               
               <div>
                 <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                  <Phone className="text-primary" size={20} /> 1. Contact Information
+                  <Phone className="text-primary" size={20} /> {t("step1Contact")}
                 </h3>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Mobile Number (WhatsApp) *</label>
-                  <input type="tel" name="contactNumber" required value={formData.contactNumber} onChange={handleInputChange} placeholder="e.g. +966 50 123 4567" className={inputStyles} />
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("mobileNumber")}</label>
+                  <input type="tel" name="contactNumber" required value={formData.contactNumber} onChange={handleInputChange} placeholder="e.g. +966 50 123 4567" className={inputStyles} dir="ltr" />
                 </div>
               </div>
 
               <div>
                 <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                  <CarFront className="text-primary" size={20} /> 2. Vehicle You Are Offering
+                  <CarFront className="text-primary" size={20} /> {t("step2VehicleOffering")}
                 </h3>
                 
                 <div className="mb-6">
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Car Photo (Highly Recommended)</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t("carPhotoLabel")}</label>
                   {imagePreview ? (
                     <div className="relative w-full h-56 rounded-2xl overflow-hidden group shadow-md border border-slate-200">
                       <img src={imagePreview} alt="Car Preview" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <button type="button" onClick={() => setImagePreview(null)} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors">
-                          <X size={18} /> Remove Image
+                          <X size={18} /> {t("removeImage")}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <label className="w-full h-56 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center text-slate-500 hover:bg-orange-50 hover:border-primary hover:text-primary transition-colors cursor-pointer group">
                       <UploadCloud size={40} className="mb-3 opacity-50 group-hover:opacity-100 transition-opacity" />
-                      <span className="text-base font-bold mb-1">Click to upload a photo of your car</span>
-                      <span className="text-xs text-slate-400">JPG, PNG, WEBP accepted</span>
+                      <span className="text-base font-bold mb-1">{t("clickToUploadCarPhoto")}</span>
+                      <span className="text-xs text-slate-400">{t("acceptedFormats")}</span>
                       <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                     </label>
                   )}
@@ -290,19 +294,19 @@ export default function CarSwapPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Make *</label>
-                    <input type="text" name="myMake" required value={formData.myMake} onChange={handleInputChange} placeholder="e.g. Toyota" className={inputStyles} />
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("makeReq")}</label>
+                    <input type="text" name="myMake" required value={formData.myMake} onChange={handleInputChange} placeholder={t("egToyota")} className={inputStyles} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Model *</label>
-                    <input type="text" name="myModel" required value={formData.myModel} onChange={handleInputChange} placeholder="e.g. Camry" className={inputStyles} />
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("modelReq")}</label>
+                    <input type="text" name="myModel" required value={formData.myModel} onChange={handleInputChange} placeholder={t("egCamry")} className={inputStyles} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Year *</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("yearReq")}</label>
                     <input type="number" name="myYear" required value={formData.myYear} onChange={handleInputChange} placeholder="2022" className={inputStyles} />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Current Mileage (km)</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("currentMileage")}</label>
                     <input type="number" name="myMileage" value={formData.myMileage} onChange={handleInputChange} placeholder="e.g. 45000" className={inputStyles} />
                   </div>
                 </div>
@@ -310,39 +314,39 @@ export default function CarSwapPage() {
 
               <div>
                 <h3 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-2 mb-6 flex items-center gap-2">
-                  <Search className="text-purple-600" size={20} /> 3. Vehicle You Are Looking For
+                  <Search className="text-purple-600" size={20} /> {t("step3VehicleLookingFor")}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Preferred Body Type</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("preferredBodyType")}</label>
                     <select name="targetType" value={formData.targetType} onChange={handleInputChange} className={selectStyles}>
-                      <option value="">Any Body Type</option>
-                      <option value="Sedan">Sedan</option>
-                      <option value="SUV">SUV</option>
-                      <option value="Sports">Sports Car</option>
-                      <option value="Truck">Truck / Pickup</option>
-                      <option value="Coupe">Coupe</option>
-                      <option value="Luxury">Luxury</option>
+                      <option value="">{t("anyBodyType")}</option>
+                      <option value="Sedan">{t("sedan")}</option>
+                      <option value="SUV">{t("suv")}</option>
+                      <option value="Sports">{t("sportsCar")}</option>
+                      <option value="Truck">{t("truck")}</option>
+                      <option value="Coupe">{t("coupe")}</option>
+                      <option value="Luxury">{t("luxury")}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-1">Preferred Brand & Model (Optional)</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-1">{t("preferredBrandModel")}</label>
                     <input type="text" name="targetMake" value={formData.targetMake} onChange={handleInputChange} placeholder="e.g. BMW, Mercedes, or Any" className={inputStyles} />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Swap Terms & Notes</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1">{t("swapTermsNotes")}</label>
                 <textarea 
                   name="notes" value={formData.notes} onChange={handleInputChange} 
-                  placeholder="E.g. Willing to pay up to 10,000 ريال cash difference..." 
-                  className="w-full textarea textarea-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-4 min-h-[120px] border-slate-200" 
+                  placeholder={t("swapNotesPlaceholder")} 
+                  className="w-full textarea textarea-bordered bg-slate-50 text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-4 min-h-[120px] border-slate-200 rtl:text-right" 
                 />
               </div>
 
-              <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-primary hover:bg-secondary text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-orange-500/20">
-                {isSubmitting ? "Submitting..." : "Submit Swap Proposal"}
+              <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-primary hover:bg-secondary text-white rounded-xl font-bold text-lg transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50">
+                {isSubmitting ? t("submitting") : t("submitSwapProposal")}
               </button>
 
             </form>

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { CarFront, Calendar, CheckCircle, Clock, Users, Search, SlidersHorizontal, X, AlertCircle, Upload, ShieldCheck } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../../../context/LanguageContext";
 
 const AVAILABLE_CARS = [
   { id: "c1", make: "Toyota", model: "Camry", year: "2024", color: "Pearl White", price: 65, image: "https://images.toyota-europe.com/hu/product-token/249c2709-1c4d-49c9-a758-babff8a95f6e/vehicle/467670d4-a811-40d6-bee0-5d56c108006d/width/1600/height/900/scale-mode/1/padding/12/background-colour/FFFFFF/image-quality/75/day-exterior-3_1F7_FA20.webp", type: "Sedan", seats: 5, fuel: "gasoline", transmission: "automatic" },
@@ -17,6 +19,8 @@ const AVAILABLE_CARS = [
 
 export default function CarRentalsPage() {
   const { user } = useAuth();
+  // 2. INITIALIZE TRANSLATION ENGINE
+  const { t } = useLanguage();
   
   const [activeTab, setActiveTab] = useState<'browse' | 'bookings'>('browse');
   const [myRentals, setMyRentals] = useState<any[]>([]);
@@ -125,7 +129,7 @@ export default function CarRentalsPage() {
         model: selectedCar.model,
         year: selectedCar.year,
         dailyPrice: selectedCar.price,
-        totalDays: totalDays,         
+        totalDays: totalDays,        
         totalPrice: totalPrice,       
         startDate: bookingForm.startDate,
         endDate: bookingForm.endDate,
@@ -168,34 +172,34 @@ export default function CarRentalsPage() {
 
     } catch (error) {
       console.error("Error booking car:", error);
-      alert("Failed to confirm booking. Please try again.");
+      alert(t("failedBooking"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto pb-10">
+    <div className="max-w-7xl mx-auto pb-10 text-start">
       
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Car Rentals</h1>
-        <p className="text-slate-500 mt-1">Browse available vehicles and manage your bookings</p>
+        <h1 className="text-3xl font-bold text-slate-900">{t("carRentalsTitle")}</h1>
+        <p className="text-slate-500 mt-1">{t("carRentalsSubtitle")}</p>
       </div>
 
       <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-full w-fit mb-8">
-        <button onClick={() => setActiveTab('browse')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'browse' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>Browse Cars</button>
-        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'bookings' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>My Bookings</button>
+        <button onClick={() => setActiveTab('browse')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'browse' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>{t("browseCarsTab")}</button>
+        <button onClick={() => setActiveTab('bookings')} className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${activeTab === 'bookings' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}>{t("myBookingsTab")}</button>
       </div>
 
       {activeTab === 'browse' && (
         <div className="animate-in fade-in duration-300">
           <div className="flex flex-col md:flex-row gap-4 mb-8">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-3.5 text-slate-400" size={20} />
-              <input type="text" placeholder="Search by make or model..." className="w-full h-12 pl-12 pr-4 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary" />
+              <Search className="absolute ltr:left-4 rtl:right-4 top-3.5 text-slate-400" size={20} />
+              <input type="text" placeholder={t("searchMakeModel")} className="w-full h-12 ltr:pl-12 rtl:pr-12 rtl:pl-4 ltr:pr-4 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary" />
             </div>
             <button className="flex items-center justify-center gap-2 h-12 px-6 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium hover:bg-slate-50 transition-colors">
-              <SlidersHorizontal size={18} /> All Types
+              <SlidersHorizontal size={18} /> {t("allTypes")}
             </button>
           </div>
 
@@ -204,8 +208,8 @@ export default function CarRentalsPage() {
               <div key={car.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden group">
                 <div className="relative h-56 w-full bg-slate-100 overflow-hidden">
                   <img src={car.image} alt={car.model} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">
-                    <span className="font-bold text-slate-900">{car.price}</span><span className="text-xs font-medium text-slate-500 ml-1">ريال/day</span>
+                  <div className="absolute top-4 ltr:right-4 rtl:left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1">
+                    <span className="font-bold text-slate-900">{car.price}</span><span className="text-xs font-medium text-slate-500">{t("currencySAR")}/{t("day")}</span>
                   </div>
                 </div>
                 <div className="p-5">
@@ -216,7 +220,7 @@ export default function CarRentalsPage() {
                     <span className="flex items-center gap-1.5"><CarFront size={14} /> {car.fuel}</span>
                     <span className="flex items-center gap-1.5"><Users size={14} /> {car.seats}</span>
                   </div>
-                  <button onClick={() => setSelectedCar(car)} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors">Book Now</button>
+                  <button onClick={() => setSelectedCar(car)} className="w-full bg-[#0f172a] hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-colors">{t("bookNow")}</button>
                 </div>
               </div>
             ))}
@@ -228,12 +232,12 @@ export default function CarRentalsPage() {
         <div className="animate-in fade-in duration-300">
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
             {loading ? (
-              <div className="flex items-center justify-center h-[400px] text-slate-400 font-medium"><Clock className="animate-spin mr-2" size={20} /> Loading bookings...</div>
+              <div className="flex items-center justify-center h-[400px] text-slate-400 font-medium"><Clock className="animate-spin ltr:mr-2 rtl:ml-2" size={20} /> {t("loadingBookings")}</div>
             ) : myRentals.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[400px] text-center px-6">
                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4"><Calendar size={28} /></div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No active bookings</h3>
-                <p className="text-slate-500 max-w-sm mx-auto">You haven't rented any vehicles yet. Switch to the Browse tab to find your next ride!</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{t("noActiveBookings")}</h3>
+                <p className="text-slate-500 max-w-sm mx-auto">{t("noBookingsSubtitle")}</p>
               </div>
             ) : (
               <div className="divide-y divide-slate-50">
@@ -252,17 +256,17 @@ export default function CarRentalsPage() {
                         <div>
                           <h3 className="font-bold text-slate-900 text-lg">{rental.make} {rental.model}</h3>
                           <p className="text-sm text-slate-500 flex items-center gap-2 mt-1">
-                            <span>{rental.startDate} to {rental.endDate}</span>
+                            <span>{rental.startDate} {t("toWord")} {rental.endDate}</span>
                             <span className="text-slate-300">•</span>
-                            <span className="font-semibold text-slate-700">{rental.totalPrice ? `${rental.totalPrice.toLocaleString()} ريال total` : `${rental.dailyPrice} ريال / day`}</span>
+                            <span className="font-semibold text-slate-700">{rental.totalPrice ? `${rental.totalPrice.toLocaleString()} ${t("currencySAR")} ${t("total")}` : `${rental.dailyPrice} ${t("currencySAR")} / ${t("day")}`}</span>
                           </p>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <span className={`px-3 py-1 rounded-md text-xs font-bold border ${badgeClasses}`}>
-                          {rental.status}
+                          {rental.status === "Pending" ? t("pendingStatus") : rental.status}
                         </span>
-                        <span className="text-xs text-slate-400">Pickup: {rental.pickupLocation?.split('(')[0] || rental.pickupLocation}</span>
+                        <span className="text-xs text-slate-400">{t("pickupLocation")}: {rental.pickupLocation?.split('(')[0] || rental.pickupLocation}</span>
                       </div>
                     </div>
                   );
@@ -277,19 +281,19 @@ export default function CarRentalsPage() {
       {selectedCar && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
-            <button onClick={() => setSelectedCar(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors"><X size={20} /></button>
-            <h2 className="text-xl font-bold text-slate-900 mb-6">Book {selectedCar.make} {selectedCar.model}</h2>
+            <button onClick={() => setSelectedCar(null)} className="absolute top-6 right-6 rtl:left-6 rtl:right-auto text-slate-400 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors"><X size={20} /></button>
+            <h2 className="text-xl font-bold text-slate-900 mb-6">{t("bookWord")} {selectedCar.make} {selectedCar.model}</h2>
             <form onSubmit={handleConfirmBooking} className="space-y-4">
               
               {/* LICENSE VERIFICATION SECTION */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 mb-4">
                 {hasLicense ? (
                   <div className="flex items-center gap-2 text-green-600 font-bold text-sm">
-                    <ShieldCheck size={20} /> Driver's License Verified
+                    <ShieldCheck size={20} /> {t("dlVerified")}
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">Upload Driver's License (First time only) *</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">{t("uploadDLRequired")}</label>
                     {licensePreview ? (
                       <div className="relative h-32 rounded-lg overflow-hidden border border-slate-300">
                         <img src={licensePreview} alt="License Preview" className="w-full h-full object-cover" />
@@ -298,7 +302,7 @@ export default function CarRentalsPage() {
                     ) : (
                       <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-white hover:border-primary transition-colors group">
                         <Upload className="text-slate-400 mb-1 group-hover:text-primary transition-colors" />
-                        <span className="text-xs text-slate-500 font-medium group-hover:text-primary transition-colors">Click to upload license</span>
+                        <span className="text-xs text-slate-500 font-medium group-hover:text-primary transition-colors">{t("clickToUploadDL")}</span>
                         <input type="file" accept="image/*" required className="hidden" onChange={handleLicenseUpload} />
                       </label>
                     )}
@@ -307,22 +311,23 @@ export default function CarRentalsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Mobile Number (WhatsApp) *</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1">{t("mobileNumber")}</label>
                 <input 
-                  type="tel" required placeholder="e.g. +966 50 123 4567"
+                  type="tel" required placeholder="+966 50 123 4567"
                   value={bookingForm.contactNumber} 
                   onChange={(e) => setBookingForm({...bookingForm, contactNumber: e.target.value})}
                   className="w-full input input-bordered bg-white text-slate-900 h-11 rounded-xl focus:border-primary focus:outline-none px-3 border-slate-200" 
+                  dir="ltr"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">Start Date</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("startDate")}</label>
                   <input type="date" required value={bookingForm.startDate} onChange={(e) => setBookingForm({...bookingForm, startDate: e.target.value})} className="w-full input input-bordered bg-white text-slate-900 h-11 rounded-xl focus:border-primary focus:outline-none px-3 border-slate-200" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-1">End Date</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-1">{t("endDate")}</label>
                   <input type="date" required value={bookingForm.endDate} onChange={(e) => setBookingForm({...bookingForm, endDate: e.target.value})} className={`w-full input input-bordered bg-white text-slate-900 h-11 rounded-xl focus:border-primary focus:outline-none px-3 border-slate-200 ${invalidDates ? 'border-red-500' : ''}`} />
                 </div>
               </div>
@@ -331,12 +336,12 @@ export default function CarRentalsPage() {
               {totalDays > 0 && !invalidDates && (
                 <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 my-2 flex justify-between items-center">
                   <div>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">Rental Summary</p>
-                    <p className="text-sm font-medium text-slate-700">{totalDays} {totalDays === 1 ? 'Day' : 'Days'} × {selectedCar.price} ريال</p>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">{t("rentalSummary")}</p>
+                    <p className="text-sm font-medium text-slate-700">{totalDays} {totalDays === 1 ? t("dayWord") : t("daysWord")} × {selectedCar.price} {t("currencySAR")}</p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-500 font-medium mb-0.5">Total Amount</p>
-                    <p className="text-xl font-bold text-slate-900">{totalPrice.toLocaleString()} ريال</p>
+                  <div className="text-right rtl:text-left">
+                    <p className="text-xs text-slate-500 font-medium mb-0.5">{t("totalAmount")}</p>
+                    <p className="text-xl font-bold text-slate-900">{totalPrice.toLocaleString()} {t("currencySAR")}</p>
                   </div>
                 </div>
               )}
@@ -344,29 +349,29 @@ export default function CarRentalsPage() {
               {/* ERROR STATE FOR INVALID DATES */}
               {invalidDates && (
                 <div className="bg-red-50 text-red-600 p-3 rounded-xl border border-red-100 flex items-center gap-2 text-sm">
-                  <AlertCircle size={16} /> End date cannot be before start date.
+                  <AlertCircle size={16} /> {t("invalidDateError")}
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1 mt-2">Pickup Location</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1 mt-2">{t("pickupLocation")}</label>
                 <select required value={bookingForm.pickupLocation} onChange={(e) => setBookingForm({...bookingForm, pickupLocation: e.target.value})} className="w-full select select-bordered bg-white text-slate-900 h-11 rounded-xl focus:border-primary focus:outline-none px-3 border-slate-200 font-normal">
-                  <option value="" disabled>Select pickup location</option>
-                  <option value="Jeddah King Abdulaziz Airport (JED)">Jeddah King Abdulaziz Airport (JED)</option>
-                  <option value="Jeddah Downtown Branch">Jeddah Downtown Branch</option>
-                  <option value="Riyadh King Khalid Airport (RUH)">Riyadh King Khalid Airport (RUH)</option>
-                  <option value="Dammam King Fahd Airport (DMM)">Dammam King Fahd Airport (DMM)</option>
+                  <option value="" disabled>{t("selectPickup")}</option>
+                  <option value="Jeddah King Abdulaziz Airport (JED)">{t("locJED")}</option>
+                  <option value="Jeddah Downtown Branch">{t("locDowntown")}</option>
+                  <option value="Riyadh King Khalid Airport (RUH)">{t("locRUH")}</option>
+                  <option value="Dammam King Fahd Airport (DMM)">{t("locDMM")}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Notes (optional)</label>
-                <textarea value={bookingForm.notes} onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})} placeholder="Any special requests..." className="w-full textarea textarea-bordered bg-white text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-3 min-h-[100px] border-slate-200" />
+                <label className="block text-sm font-bold text-slate-700 mb-1">{t("notesOptional")}</label>
+                <textarea value={bookingForm.notes} onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})} placeholder={t("notesPlaceholder")} className="w-full textarea textarea-bordered bg-white text-slate-900 placeholder:text-slate-400 rounded-xl focus:border-primary focus:outline-none p-3 min-h-[100px] border-slate-200 rtl:text-right" />
               </div>
               
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setSelectedCar(null)} className="flex-1 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold transition-colors">Cancel</button>
+                <button type="button" onClick={() => setSelectedCar(null)} className="flex-1 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold transition-colors">{t("cancelBtn")}</button>
                 <button type="submit" disabled={isSubmitting || invalidDates || totalDays <= 0 || (!hasLicense && !licensePreview)} className="flex-1 py-3 bg-primary hover:bg-secondary text-white rounded-xl font-bold transition-all shadow-md shadow-orange-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
-                  {isSubmitting ? "Processing..." : "Confirm Booking"}
+                  {isSubmitting ? t("processingBtn") : t("confirmBookingBtn")}
                 </button>
               </div>
             </form>

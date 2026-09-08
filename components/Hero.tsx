@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import { MapPin, Calendar, Search, ArrowRightLeft, Banknote, CarFront } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Hero() {
   const [activeTab, setActiveTab] = useState("rental");
+  // 2. INITIALIZE THE TRANSLATION ENGINE
+  const { t } = useLanguage();
 
   // Helper to make buttons look "active" with your new orange color
   const getTabClass = (tabName: string) => {
     return activeTab === tabName
       ? "bg-primary text-white shadow-lg scale-105" // Active: Orange & Pop
-      : "bg-white text-gray-500 hover:bg-gray-50";  // Inactive: White & Clean
+      : "bg-white text-slate-500 hover:bg-slate-50";  // Inactive: White & Clean
   };
 
   return (
@@ -21,28 +25,28 @@ export default function Hero() {
       >
         <div className="absolute inset-0 bg-black/40 rounded-3xl"></div>
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto">
+        <div className="relative z-10 w-full max-w-5xl mx-auto text-start">
           <h1 className="text-white text-3xl md:text-5xl font-bold mb-2">
-            The All-in-One Automotive Platform
+            {t("heroMainTitle")}
           </h1>
           <p className="text-gray-200 mb-8 max-w-lg">
-            Seamlessly rent, transfer leases, finance your dream car, or swap vehicles.
+            {t("heroMainSubtitle")}
           </p>
 
           <div className="bg-white/90 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-2xl shadow-orange-500/10">
             {/* TABS */}
-            <div className="flex flex-wrap gap-4 border-b border-gray-100 pb-4 mb-6">
+            <div className="flex flex-wrap gap-4 border-b border-slate-100 pb-4 mb-6">
               <button onClick={() => setActiveTab("rental")} className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${getTabClass("rental")}`}>
-                <CarFront size={18} /> Rental
+                <CarFront size={18} /> {t("tabRental")}
               </button>
               <button onClick={() => setActiveTab("lease")} className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${getTabClass("lease")}`}>
-                <ArrowRightLeft size={18} /> Lease Transfer
+                <ArrowRightLeft size={18} /> {t("tabLease")}
               </button>
               <button onClick={() => setActiveTab("finance")} className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${getTabClass("finance")}`}>
-                <Banknote size={18} /> Financing
+                <Banknote size={18} /> {t("tabFinance")}
               </button>
               <button onClick={() => setActiveTab("swap")} className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${getTabClass("swap")}`}>
-                <ArrowRightLeft size={18} /> Car Swap
+                <ArrowRightLeft size={18} /> {t("tabSwap")}
               </button>
             </div>
 
@@ -53,18 +57,18 @@ export default function Hero() {
               {activeTab === 'rental' && (
                 <>
                   <div className="col-span-1 md:col-span-3 grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                      <label className="text-xs font-bold text-gray-500">Pick-up Location</label>
-                      <input type="text" placeholder="City, Airport..." className="w-full bg-transparent outline-none text-gray-900 font-medium mt-1" />
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <label className="text-xs font-bold text-slate-500">{t("pickupLocation")}</label>
+                      <input type="text" placeholder={t("cityAirport")} className="w-full bg-transparent outline-none text-slate-900 font-medium mt-1" />
                     </div>
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                      <label className="text-xs font-bold text-gray-500">Dates</label>
-                      <input type="text" placeholder="Select dates" className="w-full bg-transparent outline-none text-gray-900 font-medium mt-1" />
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <label className="text-xs font-bold text-slate-500">{t("dates")}</label>
+                      <input type="text" placeholder={t("selectDates")} className="w-full bg-transparent outline-none text-slate-900 font-medium mt-1" />
                     </div>
                   </div>
                   {/* The Magic Gradient Button */}
                   <button className="h-[52px] bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:opacity-90 transition-opacity w-full shadow-md shadow-orange-200">
-                    Search Cars
+                    {t("searchCars")}
                   </button>
                 </>
               )}
@@ -73,31 +77,31 @@ export default function Hero() {
               {activeTab === 'lease' && (
                 <>
                   <div className="col-span-1 md:col-span-3 grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                      <label className="text-xs font-bold text-gray-500">Car Brand/Model</label>
-                      <input type="text" placeholder="e.g. BMW X5" className="w-full bg-transparent outline-none text-gray-900 font-medium mt-1" />
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <label className="text-xs font-bold text-slate-500">{t("carBrandModel")}</label>
+                      <input type="text" placeholder={t("egBmw")} className="w-full bg-transparent outline-none text-slate-900 font-medium mt-1" />
                     </div>
-                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                      <label className="text-xs font-bold text-gray-500">Max Monthly Payment</label>
-                      <input type="number" placeholder="$500" className="w-full bg-transparent outline-none text-gray-900 font-medium mt-1" />
+                    <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                      <label className="text-xs font-bold text-slate-500">{t("maxMonthlyPayment")}</label>
+                      <input type="number" placeholder="500" className="w-full bg-transparent outline-none text-slate-900 font-medium mt-1" />
                     </div>
                   </div>
                   <div className="flex gap-2 w-full">
-                    <button className="flex-1 h-[52px] border-2 border-primary text-primary rounded-xl font-bold hover:bg-orange-50">List My Car</button>
-                    <button className="flex-1 h-[52px] bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:opacity-90 shadow-md shadow-orange-200">Find Lease</button>
+                    <button className="flex-1 h-[52px] border-2 border-primary text-primary rounded-xl font-bold hover:bg-orange-50">{t("listMyCar")}</button>
+                    <button className="flex-1 h-[52px] bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold hover:opacity-90 shadow-md shadow-orange-200">{t("findLease")}</button>
                   </div>
                 </>
               )}
 
-              {/* (I've kept Financing and Swap simpler for brevity, but they will use the same logic!) */}
+              {/* FINANCING & SWAP */}
               {activeTab === 'finance' && (
-                 <div className="col-span-4 flex items-center justify-center h-[52px] bg-gray-50 rounded-xl text-gray-400">
-                    Financing Form Placeholder
+                 <div className="col-span-4 flex items-center justify-center h-[52px] bg-slate-50 rounded-xl text-slate-400">
+                   {t("financingPlaceholder")}
                  </div>
               )}
                {activeTab === 'swap' && (
-                 <div className="col-span-4 flex items-center justify-center h-[52px] bg-gray-50 rounded-xl text-gray-400">
-                    Swap Form Placeholder
+                 <div className="col-span-4 flex items-center justify-center h-[52px] bg-slate-50 rounded-xl text-slate-400">
+                   {t("swapPlaceholder")}
                  </div>
               )}
 

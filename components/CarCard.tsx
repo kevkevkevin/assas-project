@@ -1,5 +1,9 @@
+"use client";
+
 import { Fuel, Gauge, Users, Heart } from "lucide-react";
 import Image from "next/image";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../context/LanguageContext"; 
 
 // Define what data a "Car" needs
 interface CarProps {
@@ -14,6 +18,9 @@ interface CarProps {
 
 // Added "isSwap" prop (optional, defaults to false)
 export default function CarCard({ data, isSwap = false }: { data: CarProps; isSwap?: boolean }) {
+  // 2. INITIALIZE TRANSLATION
+  const { t } = useLanguage();
+
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col h-full">
       {/* Header */}
@@ -41,7 +48,7 @@ export default function CarCard({ data, isSwap = false }: { data: CarProps; isSw
       <div className="flex justify-between text-gray-500 text-sm mb-6 mt-auto">
         <div className="flex items-center gap-1 font-medium"><Fuel size={16} className="text-gray-400"/> {data.fuel}</div>
         <div className="flex items-center gap-1 font-medium"><Gauge size={16} className="text-gray-400"/> {data.transmission}</div>
-        <div className="flex items-center gap-1 font-medium"><Users size={16} className="text-gray-400"/> {data.seats} People</div>
+        <div className="flex items-center gap-1 font-medium"><Users size={16} className="text-gray-400"/> {data.seats} {t("people")}</div>
       </div>
 
       {/* Footer: Dynamic Layout based on isSwap */}
@@ -50,7 +57,7 @@ export default function CarCard({ data, isSwap = false }: { data: CarProps; isSw
         {isSwap ? (
             // LAYOUT A: SWAP (Full width button, no price)
             <button className="w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg font-bold text-sm transition-colors shadow-sm shadow-orange-100">
-                Inquire Swap
+                {t("inquireSwap")}
             </button>
         ) : (
             // LAYOUT B: RENTAL (Price + Rent Button)
@@ -66,12 +73,12 @@ export default function CarCard({ data, isSwap = false }: { data: CarProps; isSw
                     />
                     <p className="text-xl font-bold text-gray-900">
                         {data.price}
-                        <span className="text-sm text-gray-400 font-normal">/day</span>
+                        <span className="text-sm text-gray-400 font-normal">/{t("day")}</span>
                     </p>
                     </div>
                 </div>
                 <button className="bg-primary hover:bg-secondary text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-colors shadow-sm shadow-orange-100">
-                    Rent Now
+                    {t("rentNowButton")}
                 </button>
             </>
         )}

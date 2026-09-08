@@ -5,23 +5,27 @@ import { LayoutDashboard, CarFront, FileText, Banknote, ArrowRightLeft, ShieldCh
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const { user, role } = useAuth();
+  
+  // 2. INITIALIZE THE TRANSLATION ENGINE
+  const { t } = useLanguage();
 
-  // ADDED: Maintenance is now safely inside the menu array!
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/dashboard" },
-    { name: "Car Rentals", icon: <CarFront size={20} />, path: "/dashboard/rentals" },
-    { name: "Lease Transfer", icon: <FileText size={20} />, path: "/dashboard/lease" },
-    { name: "Financing", icon: <Banknote size={20} />, path: "/dashboard/finance" },
-    { name: "Car Swap", icon: <ArrowRightLeft size={20} />, path: "/dashboard/swap" },
-    { name: "Maintenance", icon: <Wrench size={20} />, path: "/dashboard/maintenance" },
+    { name: t("dashboard"), icon: <LayoutDashboard size={20} />, path: "/dashboard" },
+    { name: t("carRentals"), icon: <CarFront size={20} />, path: "/dashboard/rentals" },
+    { name: t("leaseTransferMenu"), icon: <FileText size={20} />, path: "/dashboard/lease" },
+    { name: t("financing"), icon: <Banknote size={20} />, path: "/dashboard/finance" },
+    { name: t("carSwap"), icon: <ArrowRightLeft size={20} />, path: "/dashboard/swap" },
+    { name: t("maintenance"), icon: <Wrench size={20} />, path: "/dashboard/maintenance" },
   ];
 
   if (role === "admin") {
-    menuItems.push({ name: "Admin Panel", icon: <ShieldCheck size={20} />, path: "/dashboard/admin" });
+    menuItems.push({ name: t("adminPanel"), icon: <ShieldCheck size={20} />, path: "/dashboard/admin" });
   }
 
   return (
@@ -29,16 +33,16 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
       <div>
         <div className="p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
               <CarFront size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">AutoSettle</h1>
-              <p className="text-[10px] text-slate-400 tracking-wider uppercase">Settlement Platform</p>
+              {/* Brand name usually stays the same, but the subtitle changes */}
+              <h1 className="text-xl font-bold tracking-tight">مسارات</h1>
+              <p className="text-[10px] text-slate-400 tracking-wider uppercase">{t("platformSubtitle")}</p>
             </div>
           </div>
           
-          {/* Mobile Close Button (Hidden on Desktop) */}
           <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white p-1">
             <X size={24} />
           </button>
@@ -51,7 +55,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
               <Link
                 key={item.path}
                 href={item.path}
-                onClick={onClose} // Closes the sidebar on mobile when you click a link!
+                onClick={onClose} 
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${
                   isActive 
                     ? "bg-primary/60 text-white " 
