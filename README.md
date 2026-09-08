@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🚗 How to Update the Car Inventory (JSON)
 
-## Getting Started
+The AutoSettle platform currently utilizes static JSON arrays for lightning-fast, serverless rendering of the available and featured vehicle inventory. Follow this guide to add, edit, or remove vehicles across the platform.
 
-First, run the development server:
+### 📂 1. File Locations
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Depending on which view you want to update, locate the corresponding file in the codebase:
+
+* **Dashboard Rentals (User Portal):** `app/dashboard/rentals/page.tsx`
+  * *Search for:* `const AVAILABLE_CARS = [`
+* **Public Landing Page (Featured Cars):** `app/page.tsx`
+  * *Search for:* `const FEATURED_CARS = [`
+
+---
+
+### 📝 2. The Data Structure (Adding a Car)
+
+To add a brand new vehicle to the inventory, copy the template below and paste it inside the target array. 
+
+```javascript
+  { 
+    id: "c7", // 🔴 MUST BE UNIQUE! (e.g., c7, c8, c9)
+    make: "Lucid", 
+    model: "Air", 
+    year: "2024", 
+    color: "Quantum Grey", 
+    price: 150, // 🟢 Integer only (No quotation marks)
+    image: "/images/lucid.jpg", 
+    type: "Sedan", 
+    seats: 5, 
+    fuel: "electric", 
+    transmission: "automatic" 
+  },
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 🖼️ 3. Handling Car Images
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For the `image` property, you have two options:
+1. **Local Assets (Recommended):** Drop your optimized image (e.g., `lucid.jpg`) into the `public/` directory at the root of the project. Reference it in the JSON simply as `image: "/lucid.jpg"`.
+2. **External URLs:** You can use a direct image link hosted elsewhere. Ensure it is wrapped in quotes like this: `image: "https://example.com/car-image.jpg"`.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+### ⚠️ 4. Golden Rules to Prevent Crashes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If the platform fails to load after updating the inventory, check for these common JSON syntax errors:
+* **Strings:** Always use quotation marks `""` for text values (e.g., `"Toyota"`).
+* **Numbers:** **Never** use quotation marks for numbers (e.g., `150`).
+* **Trailing Commas:** Always place a comma `,` at the end of each car object `},` so the compiler knows another item is coming.
