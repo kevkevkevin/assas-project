@@ -1,0 +1,32 @@
+/* Keep the existing grids from the tablet breakpoint upward. */
+@media (max-width: 767px) {
+  .carousel {
+    display: flex;
+    gap: 16px;
+    margin-inline: -24px;
+    padding: 4px 24px 20px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: #93b4e3 transparent;
+  }
+
+  .carousel > div {
+    flex: 0 0 min(82vw, 340px);
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .carousel:focus-visible {
+    outline: 2px solid #0b4fb6;
+    outline-offset: 4px;
+    border-radius: 24px;
+  }
+
+  .swap {
+    scrollbar-color: #c4a2eb transparent;
+  }
+}

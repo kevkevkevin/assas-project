@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 // 1. IMPORT THE TRANSLATION HOOK
 import { useLanguage } from "../context/LanguageContext"; 
-import { CarFront, ArrowRight, Search, ShieldCheck, Zap, Star, ArrowRightLeft, CheckCircle } from "lucide-react";
+import { ArrowRight, Search, ShieldCheck, Zap, Star, ArrowRightLeft, CheckCircle } from "lucide-react";
 import CTASection from "@/components/CTASection";
-import FadeIn from "@/components/FadeIn";
+import LandingMobileNav from "@/components/LandingMobileNav";
 import Footer from "@/components/Footer";
 import Services from "@/components/Services";
+import carouselStyles from "@/components/LandingCarCarousel.module.css";
 
 // Dummy data for our new gorgeous cards
 const TOP_CARS = [
@@ -34,6 +35,7 @@ export default function LandingPage() {
   const { t, toggleLanguage, language } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,14 +61,14 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+    <div id="home" className="min-h-screen bg-slate-50 relative overflow-hidden pb-[calc(104px+env(safe-area-inset-bottom,0px))] md:pb-0">
       
       {/* Background Creative Glow */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
       <div className="absolute bottom-[20%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       {/* DYNAMIC HEADER NAV (THE BIG PILL) */}
-      <header className="fixed top-6 w-full z-50 flex justify-center px-4 pointer-events-none">
+      <header className="fixed top-6 w-full z-50 hidden md:flex justify-center px-4 pointer-events-none">
         <div className="w-full max-w-[1600px] bg-white/85 backdrop-blur-md border border-slate-200 shadow-xl shadow-slate-200/40 h-20 rounded-full flex items-center justify-between px-6 md:px-8 pointer-events-auto transition-all">
           <Link href="/" className="flex items-center gap-3 group">
             <img 
@@ -109,8 +111,26 @@ export default function LandingPage() {
         </div>
       </header>
 
+      <div className="relative z-10 flex items-center justify-between px-6 pt-6 md:hidden">
+        <Link href="/" className="flex items-center gap-2.5">
+          <img src="/logomain.png" alt="" className="h-10 w-10 object-contain" />
+          <div className="text-primary">
+            <p className="text-lg font-bold leading-tight">مسارات</p>
+            <p className="text-[10px]">التبديل التجارية</p>
+          </div>
+        </Link>
+        <button type="button" onClick={toggleLanguage} className="min-h-11 rounded-full border border-blue-100 bg-white/70 px-4 text-sm font-bold text-primary backdrop-blur-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+          {language === "en" ? "عربي" : "English"}
+        </button>
+      </div>
+
+      <LandingMobileNav onSearch={() => {
+        searchInputRef.current?.focus({ preventScroll: true });
+        searchInputRef.current?.scrollIntoView({ block: "center", behavior: "instant" });
+      }} />
+
       {/* HERO SECTION */}
-      <main className="pt-40 pb-20 px-6 relative z-10 max-w-[1600px] mx-auto">
+      <main className="pt-12 md:pt-40 pb-20 px-6 relative z-10 max-w-[1600px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
           <div className="">
@@ -134,6 +154,8 @@ export default function LandingPage() {
             <form onSubmit={handleSearch} className="bg-white p-2 rounded-full shadow-2xl shadow-slate-200/60 border border-slate-100 flex items-center max-w-xl mb-12 animate-in fade-in zoom-in-95 duration-1000 delay-150 relative">
               <div className="px-4 text-slate-400"><Search size={24} /></div>
               <input 
+                ref={searchInputRef}
+                aria-label={t("searchButton")}
                 type="text" required value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("searchPlaceholder")}
                 className="flex-1 bg-transparent border-none focus:outline-none text-slate-700 h-14 text-base md:text-lg px-2 w-full"
@@ -176,13 +198,13 @@ export default function LandingPage() {
       <section className="max-w-[1600px] mx-auto px-6 py-20 relative z-10 mt-10">
         <div className="flex justify-between items-end mb-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("topPicksTitle")}</h2>
+            <h2 id="top-picks-title" className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("topPicksTitle")}</h2>
             <p className="text-slate-500 text-lg">{t("topPicksSubtitle")}</p>
           </div>
           <button onClick={handleRentalClick} className="hidden md:block text-primary font-bold hover:underline transition-all">{t("viewAllRentals")}</button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div role="region" aria-labelledby="top-picks-title" tabIndex={0} className={`${carouselStyles.carousel} grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8`}>
           {TOP_CARS.map((car, index) => (
             <div 
               key={index} 
@@ -190,7 +212,7 @@ export default function LandingPage() {
               className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95 flex flex-col" 
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="relative h-60 w-full bg-slate-100 overflow-hidden">
+              <div className="relative h-48 md:h-60 w-full bg-slate-100 overflow-hidden">
                 <img src={car.image} alt={car.model} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-sm">
                   <span className="font-extrabold text-slate-900">{car.price}</span><span className="text-xs font-bold text-slate-500 ml-1">{t("perDay")}</span>
@@ -222,20 +244,20 @@ export default function LandingPage() {
       <section className="max-w-[1600px] mx-auto px-6 pb-24 relative z-10">
         <div className="flex justify-between items-end mb-10 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("swapTitle")}</h2>
+            <h2 id="available-swaps-title" className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("swapTitle")}</h2>
             <p className="text-slate-500 text-lg">{t("swapSubtitle")}</p>
           </div>
           <button onClick={handleSwapClick} className="hidden md:block text-purple-600 font-bold hover:underline transition-all">{t("seeAllSwaps")}</button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div role="region" aria-labelledby="available-swaps-title" tabIndex={0} className={`${carouselStyles.carousel} ${carouselStyles.swap} grid grid-cols-1 md:grid-cols-3 gap-8`}>
           {SWAP_CARS.map((car, index) => (
             <div 
               key={index} 
               onClick={handleSwapClick} 
               className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group cursor-pointer animate-in fade-in zoom-in-95 flex flex-col"
             >
-              <div className="relative h-56 w-full bg-slate-100 overflow-hidden">
+              <div className="relative h-48 md:h-56 w-full bg-slate-100 overflow-hidden">
                 <img src={car.image} alt={car.myModel} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute top-4 left-4 bg-purple-600 text-white px-3 py-1.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5">
                   <ArrowRightLeft size={14} /> {t("openToTrade")}

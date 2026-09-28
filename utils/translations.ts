@@ -2,6 +2,8 @@
 
 export const translations = {
   en: {
+    home: "Home",
+    mobileNavigation: "Main navigation",
     // Navigation
     login: "Log In",
     signup: "Sign Up",
@@ -376,6 +378,8 @@ export const translations = {
   },
   
   ar: {
+    home: "الرئيسية",
+    mobileNavigation: "التنقل الرئيسي",
     // Search Results Page
     searchResultsFor: "نتائج البحث عن",
     searchSubtitle: "بحثنا في جميع أنحاء منصتنا للعثور على أفضل النتائج.",
