@@ -7,9 +7,14 @@ import { auth, db } from "../../lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { CarFront, Mail, Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function SignUpPage() {
   const router = useRouter();
+  // 2. INITIALIZE TRANSLATION ENGINE
+  const { t } = useLanguage();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +41,7 @@ export default function SignUpPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "Failed to create an account.");
+      setError(err.message || t("failedCreateAccount"));
     } finally {
       setLoading(false);
     }
@@ -63,21 +68,21 @@ export default function SignUpPage() {
 
       router.push("/dashboard");
     } catch (err: any) {
-      setError("Google sign-in failed. Please try again.");
+      setError(t("googleSignInFailed"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden text-start">
       
       {/* FLOATING BACK BUTTON */}
       <Link 
         href="/" 
-        className="absolute top-6 left-6 md:top-8 md:left-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors z-50 group"
+        className="absolute top-6 ltr:left-6 rtl:right-6 md:top-8 md:ltr:left-8 md:rtl:right-8 flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900 transition-colors z-50 group"
       >
-        <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Back to Home
+        <ArrowLeft size={18} className="rtl:rotate-180 group-hover:ltr:-translate-x-1 group-hover:rtl:translate-x-1 transition-transform" /> {t("backToHome")}
       </Link>
 
       {/* Background Glows */}
@@ -89,12 +94,12 @@ export default function SignUpPage() {
           <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform">
             <CarFront size={28} />
           </div>
-          <span className="text-3xl font-extrabold text-slate-900 tracking-tight">AutoSettle</span>
+          <span className="text-3xl font-extrabold text-slate-900 tracking-tight">مسارات</span>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">Create your account</h2>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">{t("createAccount")}</h2>
         <p className="mt-2 text-center text-sm text-slate-500">
-          Already have an account?{' '}
-          <Link href="/login" className="font-bold text-primary hover:text-secondary transition-colors">Sign in here</Link>
+          {t("alreadyHaveAccount")}{' '}
+          <Link href="/login" className="font-bold text-primary hover:text-secondary transition-colors">{t("signInHere")}</Link>
         </p>
       </div>
 
@@ -105,43 +110,43 @@ export default function SignUpPage() {
             {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 font-medium">{error}</div>}
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Full Name</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1">{t("fullName")}</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><User size={18} /></div>
-                <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400" placeholder="John Doe" />
+                <div className="absolute inset-y-0 ltr:left-0 rtl:right-0 ltr:pl-4 rtl:pr-4 flex items-center pointer-events-none text-slate-400"><User size={18} /></div>
+                <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="block w-full ltr:pl-11 rtl:pr-11 ltr:pr-4 rtl:pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400 ltr:text-left rtl:text-right" placeholder="John Doe" />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Email address</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1">{t("emailAddress")}</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><Mail size={18} /></div>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400" placeholder="you@example.com" />
+                <div className="absolute inset-y-0 ltr:left-0 rtl:right-0 ltr:pl-4 rtl:pr-4 flex items-center pointer-events-none text-slate-400"><Mail size={18} /></div>
+                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="block w-full ltr:pl-11 rtl:pr-11 ltr:pr-4 rtl:pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400 ltr:text-left rtl:text-right" placeholder="you@example.com" dir="ltr" />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1">Password</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1">{t("password")}</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"><Lock size={18} /></div>
-                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400" placeholder="••••••••" />
+                <div className="absolute inset-y-0 ltr:left-0 rtl:right-0 ltr:pl-4 rtl:pr-4 flex items-center pointer-events-none text-slate-400"><Lock size={18} /></div>
+                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} className="block w-full ltr:pl-11 rtl:pr-11 ltr:pr-4 rtl:pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none transition-all text-slate-900 placeholder:text-slate-400 ltr:text-left rtl:text-right" placeholder="••••••••" dir="ltr" />
               </div>
             </div>
 
             <button type="submit" disabled={loading} className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-transparent rounded-xl shadow-md shadow-orange-500/20 text-sm font-bold text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50">
-              {loading ? "Creating account..." : "Sign up"} <ArrowRight size={18} />
+              {loading ? t("creatingAccount") : t("signUpBtn")} <ArrowRight size={18} className="rtl:rotate-180" />
             </button>
           </form>
 
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200" /></div>
-              <div className="relative flex justify-center text-sm"><span className="px-4 bg-white text-slate-400 font-medium">Or continue with</span></div>
+              <div className="relative flex justify-center text-sm"><span className="px-4 bg-white text-slate-400 font-medium">{t("orContinueWith")}</span></div>
             </div>
             <div className="mt-6">
               <button onClick={handleGoogleSignUp} disabled={loading} className="w-full flex justify-center items-center gap-3 py-3.5 px-4 border-2 border-slate-100 rounded-xl shadow-sm bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all focus:outline-none disabled:opacity-50">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                Sign up with Google
+                {t("signUpGoogle")}
               </button>
             </div>
           </div>

@@ -338,9 +338,54 @@ export const translations = {
     submitSwapProposal: "Submit Swap Proposal",
     failedToSubmitSwap: "Failed to submit request.",
     interestedInTrading: "I am interested in trading my car for the AutoSettle Certified",
+
+    // Login Page
+    backToHome: "Back to Home",
+    welcomeBack: "Welcome back",
+    dontHaveAccount: "Don't have an account?",
+    signUpHere: "Sign up here",
+    emailAddress: "Email address",
+    password: "Password",
+    forgotPassword: "Forgot password?",
+    signingIn: "Signing in...",
+    signInBtn: "Sign in",
+    orContinueWith: "Or continue with",
+    signInGoogle: "Sign in with Google",
+    invalidEmailPassword: "Invalid email or password.",
+    googleSignInFailed: "Google sign-in failed. Please try again.",
+
+    // Sign Up Page
+    createAccount: "Create your account",
+    alreadyHaveAccount: "Already have an account?",
+    signInHere: "Sign in here",
+    fullName: "Full Name",
+    creatingAccount: "Creating account...",
+    signUpBtn: "Sign up",
+    signUpGoogle: "Sign up with Google",
+    failedCreateAccount: "Failed to create an account.",
+
+    // Search Results Page
+    searchResultsFor: "Search Results for",
+    searchSubtitle: "We searched across our entire platform to find the best matches.",
+    searchingDb: "Searching database...",
+    noMatchesFound: "No exact matches found",
+    noMatchesDesc: "Try adjusting your search terms, or browse our categories directly from the dashboard.",
+    leaseWord: "Lease",
+    swapWord: "Swap",
+    anyWord: "Any",
   },
   
   ar: {
+    // Search Results Page
+    searchResultsFor: "نتائج البحث عن",
+    searchSubtitle: "بحثنا في جميع أنحاء منصتنا للعثور على أفضل النتائج.",
+    searchingDb: "جاري البحث في قاعدة البيانات...",
+    noMatchesFound: "لم يتم العثور على نتائج مطابقة",
+    noMatchesDesc: "حاول تعديل كلمات البحث، أو تصفح فئاتنا مباشرة من لوحة التحكم.",
+    leaseWord: "تأجير",
+    swapWord: "مقايضة",
+    anyWord: "أي",
+    
     // Navigation
     login: "تسجيل الدخول",
     signup: "إنشاء حساب",
@@ -677,6 +722,31 @@ export const translations = {
     submitSwapProposal: "تقديم عرض المقايضة",
     failedToSubmitSwap: "فشل في تقديم الطلب.",
     interestedInTrading: "أنا مهتم بمقايضة سيارتي بسيارة مسارات المعتمدة",
+
+    // Login Page
+    backToHome: "العودة للرئيسية",
+    welcomeBack: "مرحباً بعودتك",
+    dontHaveAccount: "ليس لديك حساب؟",
+    signUpHere: "سجل من هنا",
+    emailAddress: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    forgotPassword: "نسيت كلمة المرور؟",
+    signingIn: "جاري تسجيل الدخول...",
+    signInBtn: "تسجيل الدخول",
+    orContinueWith: "أو المتابعة باستخدام",
+    signInGoogle: "تسجيل الدخول باستخدام Google",
+    invalidEmailPassword: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    googleSignInFailed: "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى.",
+
+    // Sign Up Page
+    createAccount: "إنشاء حسابك",
+    alreadyHaveAccount: "لديك حساب بالفعل؟",
+    signInHere: "سجل دخولك من هنا",
+    fullName: "الاسم الكامل",
+    creatingAccount: "جاري إنشاء الحساب...",
+    signUpBtn: "إنشاء حساب",
+    signUpGoogle: "إنشاء حساب باستخدام Google",
+    failedCreateAccount: "فشل في إنشاء الحساب.",
   }
 };
 

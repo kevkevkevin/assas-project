@@ -5,13 +5,17 @@ import Link from "next/link";
 import { useEffect, useState, Suspense } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { CarFront, ArrowLeft, FileText, ArrowRightLeft, Search as SearchIcon } from "lucide-react";
+import { ArrowLeft, FileText, ArrowRightLeft, Search as SearchIcon } from "lucide-react";
+// 1. IMPORT THE TRANSLATION HOOK
+import { useLanguage } from "../../context/LanguageContext";
 
-// We wrap the main logic in a Suspense component because useSearchParams requires it in Next.js 13+
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q")?.toLowerCase() || "";
   
+  // 2. INITIALIZE TRANSLATION ENGINE
+  const { t } = useLanguage();
+
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,32 +62,32 @@ function SearchContent() {
   }, [query]);
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
+    <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6 text-start">
       <div className="max-w-7xl mx-auto">
         
         <Link href="/" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold mb-8 transition-colors group">
-          <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Back to Home
+          <ArrowLeft size={18} className="rtl:rotate-180 group-hover:ltr:-translate-x-1 group-hover:rtl:translate-x-1 transition-transform" /> {t("backToHome")}
         </Link>
 
         <div className="mb-12">
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-2">
-            Search Results for <span className="text-primary">"{query}"</span>
+            {t("searchResultsFor")} <span className="text-primary">"{query}"</span>
           </h1>
-          <p className="text-slate-500 text-lg">We searched across our entire platform to find the best matches.</p>
+          <p className="text-slate-500 text-lg">{t("searchSubtitle")}</p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400">
             <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-4"></div>
-            <p className="font-bold text-lg">Searching database...</p>
+            <p className="font-bold text-lg">{t("searchingDb")}</p>
           </div>
         ) : results.length === 0 ? (
           <div className="flex flex-col items-center justify-center bg-white rounded-3xl border border-slate-100 py-20 px-6 text-center shadow-sm">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-4">
               <SearchIcon size={32} />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">No exact matches found</h3>
-            <p className="text-slate-500 max-w-md">Try adjusting your search terms, or browse our categories directly from the dashboard.</p>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">{t("noMatchesFound")}</h3>
+            <p className="text-slate-500 max-w-md">{t("noMatchesDesc")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -95,9 +99,13 @@ function SearchContent() {
                   <span className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 ${
                     item.type === 'Lease' ? 'bg-orange-50 text-orange-600' : 'bg-purple-50 text-purple-600'
                   }`}>
-                    {item.type === 'Lease' ? <FileText size={14}/> : <ArrowRightLeft size={14}/>} {item.type}
+                    {item.type === 'Lease' ? <FileText size={14}/> : <ArrowRightLeft size={14}/>} 
+                    {item.type === 'Lease' ? t("leaseWord") : t("swapWord")}
                   </span>
-                  <span className="text-xs font-bold text-slate-400">{item.status}</span>
+                  <span className="text-xs font-bold text-slate-400">
+                     {/* Translate status if matched, else raw */}
+                     {item.status === 'Under Review' ? t("underReview") : item.status === 'Reviewing Matches' ? t("reviewingMatches") : item.status}
+                  </span>
                 </div>
 
                 {/* Content */}
@@ -105,14 +113,16 @@ function SearchContent() {
                   <div>
                     <h3 className="font-extrabold text-xl text-slate-900 mb-1">{item.make} {item.model}</h3>
                     <p className="text-sm text-slate-500 mb-4">{item.year} • {item.mileage} km</p>
-                    <p className="text-2xl font-bold text-primary">{item.monthlyPayment} <span className="text-sm font-medium text-slate-400">ريال/mo</span></p>
+                    <p className="text-2xl font-bold text-primary flex items-baseline gap-1">
+                      {item.monthlyPayment} <span className="text-sm font-medium text-slate-400">{t("currencySAR")}/{t("perMonthText")}</span>
+                    </p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Offering</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">{t("offeringLabel")}</p>
                     <h3 className="font-extrabold text-xl text-slate-900 mb-4">{item.myMake} {item.myModel}</h3>
-                    <p className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-0.5">Looking For</p>
-                    <h3 className="font-extrabold text-lg text-slate-700">{item.targetMake || 'Any'} {item.targetType}</h3>
+                    <p className="text-xs font-bold text-purple-400 uppercase tracking-wider mb-0.5">{t("lookingForLabel")}</p>
+                    <h3 className="font-extrabold text-lg text-slate-700">{item.targetMake || t("anyWord")} {t(item.targetType?.toLowerCase() as any) || item.targetType}</h3>
                   </div>
                 )}
               </div>
@@ -129,11 +139,11 @@ function SearchContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center font-bold text-primary">Loading Search...</div>}>
-      <header className="fixed top-6 w-full z-50 flex justify-center px-4 pointer-events-none">
+      <header className="fixed top-6 w-full z-50 flex justify-center px-4 pointer-events-none text-start">
         <div className="w-full max-w-[1600px] bg-white/85 backdrop-blur-md border border-slate-200 shadow-xl shadow-slate-200/40 h-20 rounded-full flex items-center px-6 md:px-8 pointer-events-auto">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white"><CarFront size={22} /></div>
-            <span className="text-xl md:text-2xl font-extrabold text-slate-900">AutoSettle</span>
+            <img src="/logomain.png" alt="مسارات Logo" className="w-10 h-10 object-contain hover:scale-105 transition-transform" />
+            <span className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">مسارات</span>
           </Link>
         </div>
       </header>
