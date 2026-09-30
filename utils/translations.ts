@@ -2,6 +2,11 @@
 
 export const translations = {
   en: {
+    mobileHeroTitle: "Find Your",
+    mobileHeroHighlight: "Next Car",
+    mobileHeroSubtitle: "Explore cars to rent, finance, or make your own.",
+    mobileSearchPlaceholder: "Find your next car...",
+    vehicleServices: "Vehicle services",
     home: "Home",
     mobileNavigation: "Main navigation",
     // Navigation
@@ -378,6 +383,11 @@ export const translations = {
   },
   
   ar: {
+    mobileHeroTitle: "اعثر على",
+    mobileHeroHighlight: "سيارتك القادمة",
+    mobileHeroSubtitle: "اكتشف سيارات للإيجار أو التمويل أو التملك.",
+    mobileSearchPlaceholder: "ابحث عن سيارتك القادمة...",
+    vehicleServices: "خدمات السيارات",
     home: "الرئيسية",
     mobileNavigation: "التنقل الرئيسي",
     // Search Results Page

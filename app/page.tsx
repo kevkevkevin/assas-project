@@ -9,6 +9,7 @@ import { useLanguage } from "../context/LanguageContext";
 import { ArrowRight, Search, ShieldCheck, Zap, Star, ArrowRightLeft, CheckCircle } from "lucide-react";
 import CTASection from "@/components/CTASection";
 import LandingMobileNav from "@/components/LandingMobileNav";
+import LandingMobileHero from "@/components/LandingMobileHero";
 import Footer from "@/components/Footer";
 import Services from "@/components/Services";
 import carouselStyles from "@/components/LandingCarCarousel.module.css";
@@ -130,8 +131,9 @@ export default function LandingPage() {
       }} />
 
       {/* HERO SECTION */}
-      <main className="pt-12 md:pt-40 pb-20 px-6 relative z-10 max-w-[1600px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      <main className="pt-6 md:pt-40 md:pb-20 px-6 relative z-10 max-w-[1600px] mx-auto">
+        <LandingMobileHero inputRef={searchInputRef} />
+        <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           
           <div className="">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-sm mb-6 border border-blue-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -154,7 +156,6 @@ export default function LandingPage() {
             <form onSubmit={handleSearch} className="bg-white p-2 rounded-full shadow-2xl shadow-slate-200/60 border border-slate-100 flex items-center max-w-xl mb-12 animate-in fade-in zoom-in-95 duration-1000 delay-150 relative">
               <div className="px-4 text-slate-400"><Search size={24} /></div>
               <input 
-                ref={searchInputRef}
                 aria-label={t("searchButton")}
                 type="text" required value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t("searchPlaceholder")}
@@ -195,7 +196,7 @@ export default function LandingPage() {
       {/* ========================================= */}
       {/* SECTION 1: Top Picks (Rentals)            */}
       {/* ========================================= */}
-      <section className="max-w-[1600px] mx-auto px-6 py-20 relative z-10 mt-10">
+      <section className="max-w-[1600px] mx-auto px-6 py-10 md:py-20 relative z-10 md:mt-10">
         <div className="flex justify-between items-end mb-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div>
             <h2 id="top-picks-title" className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">{t("topPicksTitle")}</h2>
